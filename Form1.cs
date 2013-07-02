@@ -107,6 +107,18 @@ namespace EdwardScissorhands
                               masterDoc.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertySubject].Value = value;
                               break;
 
+                           case "style":
+                              string fullStyleName = Path.Combine(root, value);
+                              if (File.Exists(fullStyleName))
+                              {
+                                 masterDoc.CopyStylesFromTemplate(fullStyleName);
+                              }
+                              else
+                              {
+                                 MessageBox.Show("Could not find style {0}", fullStyleName);
+                              }
+                              break;
+
                            default:
                               MessageBox.Show(String.Format("Unknown meta data: {0} = {1}", key, value));
                               break;
