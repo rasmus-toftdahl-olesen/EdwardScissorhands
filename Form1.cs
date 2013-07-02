@@ -68,12 +68,11 @@ namespace EdwardScissorhands
       {
          this.Enabled = false;
 
-         Microsoft.Office.Interop.Word.ApplicationClass app = new ApplicationClass();
+         Microsoft.Office.Interop.Word.Application app = new Microsoft.Office.Interop.Word.Application();
          Document masterDoc = app.Documents.Add();
          object missing = System.Reflection.Missing.Value;
          try
          {
-           // masterDoc.OriginalDocumentTitle = "SeqZap Manual";
             string root = Path.GetDirectoryName(m_filename);
             string outputFilename = Path.Combine(root, Path.GetFileNameWithoutExtension(m_filename) + ".docx");
             masterDoc.SaveAs2(outputFilename);
@@ -93,6 +92,19 @@ namespace EdwardScissorhands
                         switch (key)
                         {
                            case "title":
+                              masterDoc.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyTitle].Value = value;
+                              break;
+
+                           case "author":
+                              masterDoc.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyAuthor].Value = value;
+                              break;
+
+                           case "company":
+                              masterDoc.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyCompany].Value = value;
+                              break;
+
+                           case "subject":
+                              masterDoc.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertySubject].Value = value;
                               break;
 
                            default:
@@ -130,7 +142,7 @@ namespace EdwardScissorhands
          }
          finally
          {
-            app.Quit(true, missing, missing);
+            (app as _Application).Quit(true, missing, missing);
             this.Enabled = true;
          }
 
