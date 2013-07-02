@@ -213,3 +213,7 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# Ignore generated files
+Test1/Test1.docx
+Test1/Test1.pdf
