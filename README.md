@@ -34,3 +34,12 @@ If you give edward --generate as the first argument, he will generate the file a
 So to generate the above file you would have to say:
 
     EdwardScissorhands.exe --generate Test1.Edward
+
+FAQ
+---
+
+### My Table Of Contents if not updated
+
+You should put your table of contents in a seperate file, not sure why, word decides the rules here.
+
+Take a look at the Test1 example in this repo.
