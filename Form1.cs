@@ -47,7 +47,7 @@ namespace EdwardScissorhands
 
       protected override void OnLoad(EventArgs e)
       {
- 	      base.OnLoad(e);
+         base.OnLoad(e);
 
          this.Text += String.Format(" v. {0}", Program.VERSION);
          m_filenameTextbox.Text = m_filename;
@@ -64,10 +64,11 @@ namespace EdwardScissorhands
          GenerateAll();
       }
 
-      private void GenerateAll ()
+      private void GenerateAll()
       {
          this.Enabled = false;
 
+         HtmlGenerator htmlGenerator = new HtmlGenerator();
          Microsoft.Office.Interop.Word.Application app = new Microsoft.Office.Interop.Word.Application();
          Document masterDoc = app.Documents.Add();
          object missing = System.Reflection.Missing.Value;
@@ -79,7 +80,7 @@ namespace EdwardScissorhands
             foreach (string rawLine in m_text.Text.Split('\n'))
             {
                string line = rawLine.Trim();
-               if (line.Length > 0 )
+               if (line.Length > 0)
                {
                   if (line[0] == '#')
                   {
@@ -120,7 +121,32 @@ namespace EdwardScissorhands
                               break;
 
                            default:
-                              MessageBox.Show(String.Format("Unknown meta data: {0} = {1}", key, value));
+                              if (key.StartsWith("html."))
+                              {
+                                 switch (key.Substring("html.".Length))
+                                 {
+                                    case "style":
+                                       htmlGenerator.AddExternalStyle(value);
+                                       break;
+
+                                    case "enabled":
+                                       htmlGenerator.Enabled = Boolean.Parse(value);
+                                       break;
+
+                                    case "smallest-level":
+                                    case "smallestlevel":
+                                       htmlGenerator.SmallestLevel = Int32.Parse(value);
+                                       break;
+                                       
+                                    default:
+                                       MessageBox.Show(String.Format("Unknown html setting: {0} = {1}", key, value));
+                                       break;
+                                 }
+                              }
+                              else
+                              {
+                                 MessageBox.Show(String.Format("Unknown meta data: {0} = {1}", key, value));
+                              }
                               break;
                         }
                      }
@@ -143,7 +169,7 @@ namespace EdwardScissorhands
             }
             masterDoc.Save();
 
-            foreach ( Field field in masterDoc.Fields )
+            foreach (Field field in masterDoc.Fields)
             {
                field.Update();
             }
@@ -151,6 +177,11 @@ namespace EdwardScissorhands
 
             string pdfFilename = Path.Combine(Path.GetDirectoryName(m_filename), Path.GetFileNameWithoutExtension(m_filename) + ".pdf");
             masterDoc.SaveAs2(pdfFilename, WdSaveFormat.wdFormatPDF);
+
+            if (htmlGenerator.Enabled)
+            {
+               htmlGenerator.Generate ( masterDoc, Path.Combine(Path.GetDirectoryName(m_filename), Path.GetFileNameWithoutExtension(m_filename) ) );
+            }
          }
          finally
          {
