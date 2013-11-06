@@ -53,6 +53,11 @@ namespace LibEdward
          return Outline(s_application.Documents.Open(_filename));
       }
 
+      public static OutlineItem Refresh(OutlineItem item)
+      {
+         return Outline(item.Content.Document);
+      }
+      
       public static OutlineItem Outline(Document document)
       {
          OutlineItem documentItem = new OutlineItem(document);
@@ -73,7 +78,7 @@ namespace LibEdward
                   outlineStack[outlineStack.Count - 1].UpdateEnd(end);
                   outlineStack.RemoveAt(outlineStack.Count - 1);
                }
-               outlineStack.Add(new OutlineItem(outlineLevel, paragraph.Range, outlineStack[outlineStack.Count - 1]));
+               outlineStack.Add(new OutlineItem(paragraph, outlineStack[outlineStack.Count - 1]));
                end = paragraph.Range.End;
             }
          }
