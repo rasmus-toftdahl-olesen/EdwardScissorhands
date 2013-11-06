@@ -47,7 +47,7 @@ namespace EdwardsOutline
 
       private void Populate(OutlineItem outline, TreeNodeCollection nodes)
       {
-         TreeNode node = nodes.Add(String.Format("{0} ({1})", outline.Title, outline.Level));
+         TreeNode node = nodes.Add(outline.Title, outline.Title, outline.Level,outline.Level);
          node.Tag = outline;
          foreach (OutlineItem child in outline.Children)
          {
@@ -92,6 +92,19 @@ namespace EdwardsOutline
             m_tree.SelectedNode = e.Node;
             m_nodeContextMenu.Show(m_tree, e.Location);
          }
+      }
+
+      private void m_tree_BeforeLabelEdit(object sender, NodeLabelEditEventArgs e)
+      {
+         if ((e.Node.Tag as OutlineItem).Level == 0)
+         {
+            e.CancelEdit = true;
+         }
+      }
+
+      private void m_tree_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+      {
+         (e.Node.Tag as OutlineItem).Title = e.Label;
       }
    }
 }

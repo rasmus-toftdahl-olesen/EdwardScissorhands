@@ -55,8 +55,7 @@ namespace LibEdward
 
       public static OutlineItem Outline(Document document)
       {
-         string title = document.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyTitle].Value;
-         OutlineItem documentItem = new OutlineItem(0, title, document.Content, null);
+         OutlineItem documentItem = new OutlineItem(document);
          List<OutlineItem> outlineStack = new List<OutlineItem>();
          outlineStack.Add(documentItem);
          int end = 0;
@@ -74,7 +73,7 @@ namespace LibEdward
                   outlineStack[outlineStack.Count - 1].UpdateEnd(end);
                   outlineStack.RemoveAt(outlineStack.Count - 1);
                }
-               outlineStack.Add(new OutlineItem(outlineLevel, paragraph.Range.Text, paragraph.Range, outlineStack[outlineStack.Count - 1]));
+               outlineStack.Add(new OutlineItem(outlineLevel, paragraph.Range, outlineStack[outlineStack.Count - 1]));
                end = paragraph.Range.End;
             }
          }
