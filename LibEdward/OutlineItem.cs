@@ -12,6 +12,8 @@ namespace LibEdward
       private Range m_range;
       private OutlineItem m_parent;
       private List<OutlineItem> m_children;
+      private int m_startParagraphIndex;
+      private int m_endParagraphIndex;
       
       public int Level
       {
@@ -41,10 +43,16 @@ namespace LibEdward
                return m_title.Range.Text;
             }
          }
+         /*
          set
          {
-            m_title.Range.Text = value;
+            WdOutlineLevel levelBefore = m_title.OutlineLevel;
+            m_title.Range.Text = value + "\r";
+            Paragraph paragraph = m_range.Document.Paragraphs[m_startParagraphIndex];
+            paragraph.OutlineLevel = levelBefore;
+            m_title = paragraph;
          }
+          */
       }
       public Range Content { get { return m_range; } }
       public OutlineItem Parent { get { return m_parent; } }
@@ -53,17 +61,18 @@ namespace LibEdward
       public string TextContent { get { return m_range.Text; } }
 
       internal OutlineItem(Document _document)
-         : this(_document.Content, null)
+         : this(_document.Content, null, 0)
       {
          m_document = _document;
       }
-      internal OutlineItem(Paragraph _title, OutlineItem _parent)
-         : this(_title.Range, _parent)
+      
+      internal OutlineItem(Paragraph _title, OutlineItem _parent, int _startParagraphIndex)
+         : this(_title.Range, _parent, _startParagraphIndex)
       {
          m_title = _title;
       }
       
-      private OutlineItem(Range _range, OutlineItem _parent)
+      private OutlineItem(Range _range, OutlineItem _parent, int _startParagraphIndex)
       {
          m_document = null;
          m_title = null;
@@ -74,8 +83,9 @@ namespace LibEdward
          {
             m_parent.m_children.Add(this);
          }
+         m_startParagraphIndex = _startParagraphIndex;
+         m_endParagraphIndex = _startParagraphIndex;
       }
-
 
       public void Cut()
       {
@@ -111,9 +121,48 @@ namespace LibEdward
          }
       }
 
-      internal void UpdateEnd(int _newEnd)
+      public void AppendChild(string title)
+      {
+         int level = this.Level;
+         int endBefore = m_range.End;
+         if (endBefore == m_range.Document.Content.End)
+         {
+            m_range.InsertAfter("\r" + title + "\r");
+         }
+         else
+         {
+            m_range.InsertAfter(title + "\r");
+         }
+         Paragraph newParagraph = m_range.Document.Paragraphs[m_endParagraphIndex + 1];
+         while (((int) newParagraph.OutlineLevel) != level + 1)
+         {
+            if (((int) newParagraph.OutlineLevel) > level)
+            {
+               newParagraph.OutlinePromote();
+            }
+            else
+            {
+               newParagraph.OutlineDemote();
+            }
+         }
+      }
+
+      public OutlineItem GetChild(string title)
+      {
+         foreach (OutlineItem item in m_children)
+         {
+            if (item.Title.Trim() == title)
+            {
+               return item;
+            }
+         }
+         return null;
+      }
+      
+      internal void UpdateEnd(int _newEnd, int _endParagraph)
       {
          m_range = m_range.Document.Range(m_range.Start, _newEnd);
+         m_endParagraphIndex = _endParagraph;
       }
    }
 }

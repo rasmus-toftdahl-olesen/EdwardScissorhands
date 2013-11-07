@@ -103,6 +103,15 @@ namespace EdwardsOutline
          {
             m_tree.SelectedNode = e.Node;
             OutlineItem item = e.Node.Tag as OutlineItem;
+            m_appendNewItemContextMenuItem.Enabled = item.Level < 9;
+            if (m_appendNewItemContextMenuItem.Enabled)
+            {
+               m_appendNewItemContextMenuItem.Image = m_nodeImageList.Images[item.Level + 1];
+            }
+            else
+            {
+               m_appendNewItemContextMenuItem.Image = null;
+            }
             m_cutContextMenuItem.Enabled = item.Level != 0;
             m_demoteContextMenuItem.Enabled = item.Level > 0 && item.Level < 10;
             m_promoteContextMenuItem.Enabled = item.Level > 1;
@@ -122,7 +131,7 @@ namespace EdwardsOutline
 
       private void m_tree_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
       {
-         (e.Node.Tag as OutlineItem).Title = e.Label;
+         //(e.Node.Tag as OutlineItem).Title = e.Label;
       }
 
       private void m_demoteContextMenuItem_Click(object sender, EventArgs e)
@@ -202,6 +211,20 @@ namespace EdwardsOutline
          foreach (OutlineItem child in item.Children)
          {
             PromoteRecursively(child);
+         }
+      }
+
+      private void m_appendNewItemContextMenuItem_Click(object sender, EventArgs e)
+      {
+         if (m_tree.SelectedNode != null)
+         {
+            OutlineItem item = m_tree.SelectedNode.Tag as OutlineItem;
+            if (item != null)
+            {
+               m_expanded.Add(m_tree.SelectedNode.Name);
+               item.AppendChild("RASMUS");
+               UpdateTree(Edward.Refresh(item));
+            }
          }
       }
    }

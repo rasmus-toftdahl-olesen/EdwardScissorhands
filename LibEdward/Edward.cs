@@ -44,6 +44,7 @@ namespace LibEdward
          {
             CloseAll(false);
             (s_application as _Application).Quit();
+            s_application = null;
          }
       }
 
@@ -51,6 +52,14 @@ namespace LibEdward
       {
          StartWord();
          return Outline(s_application.Documents.Open(_filename));
+      }
+
+      public static OutlineItem Create(string _filename)
+      {
+         StartWord();
+         Document doc = s_application.Documents.Add();
+         doc.SaveAs2(_filename);
+         return Outline(doc);
       }
 
       public static OutlineItem Refresh(OutlineItem item)
@@ -64,6 +73,7 @@ namespace LibEdward
          List<OutlineItem> outlineStack = new List<OutlineItem>();
          outlineStack.Add(documentItem);
          int end = 0;
+         int paragraphIndex = 0;
          foreach (Paragraph paragraph in document.Paragraphs)
          {
             int outlineLevel = (int) paragraph.OutlineLevel;
@@ -75,18 +85,20 @@ namespace LibEdward
             {
                while (outlineStack[outlineStack.Count - 1].Level >= outlineLevel)
                {
-                  outlineStack[outlineStack.Count - 1].UpdateEnd(end);
+                  outlineStack[outlineStack.Count - 1].UpdateEnd(end, paragraphIndex);
                   outlineStack.RemoveAt(outlineStack.Count - 1);
                }
-               outlineStack.Add(new OutlineItem(paragraph, outlineStack[outlineStack.Count - 1]));
+               outlineStack.Add(new OutlineItem(paragraph, outlineStack[outlineStack.Count - 1], paragraphIndex));
                end = paragraph.Range.End;
             }
+            paragraphIndex++;
          }
          while (outlineStack.Count > 1)
          {
-            outlineStack[outlineStack.Count - 1].UpdateEnd(end);
+            outlineStack[outlineStack.Count - 1].UpdateEnd(end, paragraphIndex);
             outlineStack.RemoveAt(outlineStack.Count - 1);
          }
+         documentItem.UpdateEnd(document.Content.End, document.Paragraphs.Count);
          return documentItem;
       }
    }

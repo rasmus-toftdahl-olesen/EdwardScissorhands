@@ -40,11 +40,13 @@
          this.m_openButton = new System.Windows.Forms.ToolStripButton();
          this.m_saveButton = new System.Windows.Forms.ToolStripButton();
          this.m_nodeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+         this.m_appendNewItemContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+         this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
          this.m_cutContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.m_demoteContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.m_promoteContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-         this.m_demoteRecursivelyContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+         this.m_demoteRecursivelyContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.m_promoteRecursivelyContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
          this.m_toolStripContainer.ContentPanel.SuspendLayout();
@@ -105,7 +107,6 @@
          this.m_tree.HideSelection = false;
          this.m_tree.ImageIndex = 0;
          this.m_tree.ImageList = this.m_nodeImageList;
-         this.m_tree.LabelEdit = true;
          this.m_tree.Location = new System.Drawing.Point(0, 0);
          this.m_tree.Name = "m_tree";
          this.m_tree.SelectedImageIndex = 0;
@@ -174,6 +175,8 @@
          // m_nodeContextMenu
          // 
          this.m_nodeContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_appendNewItemContextMenuItem,
+            this.toolStripSeparator3,
             this.m_cutContextMenuItem,
             toolStripSeparator1,
             this.m_demoteContextMenuItem,
@@ -182,7 +185,19 @@
             this.m_demoteRecursivelyContextMenuItem,
             this.m_promoteRecursivelyContextMenuItem});
          this.m_nodeContextMenu.Name = "m_treeContextMenu";
-         this.m_nodeContextMenu.Size = new System.Drawing.Size(170, 148);
+         this.m_nodeContextMenu.Size = new System.Drawing.Size(170, 154);
+         // 
+         // m_appendNewItemContextMenuItem
+         // 
+         this.m_appendNewItemContextMenuItem.Name = "m_appendNewItemContextMenuItem";
+         this.m_appendNewItemContextMenuItem.Size = new System.Drawing.Size(169, 22);
+         this.m_appendNewItemContextMenuItem.Text = "Append item";
+         this.m_appendNewItemContextMenuItem.Click += new System.EventHandler(this.m_appendNewItemContextMenuItem_Click);
+         // 
+         // toolStripSeparator3
+         // 
+         this.toolStripSeparator3.Name = "toolStripSeparator3";
+         this.toolStripSeparator3.Size = new System.Drawing.Size(166, 6);
          // 
          // m_cutContextMenuItem
          // 
@@ -208,6 +223,11 @@
          this.m_promoteContextMenuItem.Text = "Promote";
          this.m_promoteContextMenuItem.Click += new System.EventHandler(this.m_promoteContextMenuItem_Click);
          // 
+         // toolStripSeparator2
+         // 
+         this.toolStripSeparator2.Name = "toolStripSeparator2";
+         this.toolStripSeparator2.Size = new System.Drawing.Size(166, 6);
+         // 
          // m_demoteRecursivelyContextMenuItem
          // 
          this.m_demoteRecursivelyContextMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("m_demoteRecursivelyContextMenuItem.Image")));
@@ -215,11 +235,6 @@
          this.m_demoteRecursivelyContextMenuItem.Size = new System.Drawing.Size(169, 22);
          this.m_demoteRecursivelyContextMenuItem.Text = "Demote recursively";
          this.m_demoteRecursivelyContextMenuItem.Click += new System.EventHandler(this.m_demoteRecursivelyContextMenuItem_Click);
-         // 
-         // toolStripSeparator2
-         // 
-         this.toolStripSeparator2.Name = "toolStripSeparator2";
-         this.toolStripSeparator2.Size = new System.Drawing.Size(166, 6);
          // 
          // m_promoteRecursivelyContextMenuItem
          // 
@@ -270,6 +285,8 @@
       private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
       private System.Windows.Forms.ToolStripMenuItem m_demoteRecursivelyContextMenuItem;
       private System.Windows.Forms.ToolStripMenuItem m_promoteRecursivelyContextMenuItem;
+      private System.Windows.Forms.ToolStripMenuItem m_appendNewItemContextMenuItem;
+      private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
    }
 }
 
