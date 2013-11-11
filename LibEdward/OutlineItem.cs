@@ -14,7 +14,7 @@ namespace LibEdward
       private List<OutlineItem> m_children;
       private int m_startParagraphIndex;
       private int m_endParagraphIndex;
-      
+
       public int Level
       {
          get
@@ -29,7 +29,7 @@ namespace LibEdward
             }
          }
       }
-      
+
       public string Title
       {
          get
@@ -57,21 +57,36 @@ namespace LibEdward
       public Range Content { get { return m_range; } }
       public OutlineItem Parent { get { return m_parent; } }
       public IList<OutlineItem> Children { get { return m_children; } }
-      
-      public string TextContent { get { return m_range.Text; } }
+
+      public string TextContent
+      {
+         get
+         {
+            if (m_children.Count == 0)
+            {
+               Range contentRange = m_range.Document.Range(m_title.Range.End, m_range.End);
+               return contentRange.Text;
+            }
+            else
+            {
+               Range contentRange = m_range.Document.Range(m_title.Range.End, m_children[0].Content.Start - 1);
+               return contentRange.Text;
+            }
+         }
+      }
 
       internal OutlineItem(Document _document)
          : this(_document.Content, null, 0)
       {
          m_document = _document;
       }
-      
+
       internal OutlineItem(Paragraph _title, OutlineItem _parent, int _startParagraphIndex)
          : this(_title.Range, _parent, _startParagraphIndex)
       {
          m_title = _title;
       }
-      
+
       private OutlineItem(Range _range, OutlineItem _parent, int _startParagraphIndex)
       {
          m_document = null;
@@ -158,7 +173,7 @@ namespace LibEdward
          }
          return null;
       }
-      
+
       internal void UpdateEnd(int _newEnd, int _endParagraph)
       {
          m_range = m_range.Document.Range(m_range.Start, _newEnd);

@@ -68,7 +68,6 @@ namespace EdwardScissorhands
       {
          this.Enabled = false;
 
-         HtmlGenerator htmlGenerator = new HtmlGenerator();
          Microsoft.Office.Interop.Word.Application app = new Microsoft.Office.Interop.Word.Application();
          Document masterDoc = app.Documents.Add();
          object missing = System.Reflection.Missing.Value;
@@ -119,34 +118,9 @@ namespace EdwardScissorhands
                                  MessageBox.Show("Could not find style {0}", fullStyleName);
                               }
                               break;
-
+                              
                            default:
-                              if (key.StartsWith("html."))
-                              {
-                                 switch (key.Substring("html.".Length))
-                                 {
-                                    case "style":
-                                       htmlGenerator.AddExternalStyle(value);
-                                       break;
-
-                                    case "enabled":
-                                       htmlGenerator.Enabled = Boolean.Parse(value);
-                                       break;
-
-                                    case "smallest-level":
-                                    case "smallestlevel":
-                                       htmlGenerator.SmallestLevel = Int32.Parse(value);
-                                       break;
-                                       
-                                    default:
-                                       MessageBox.Show(String.Format("Unknown html setting: {0} = {1}", key, value));
-                                       break;
-                                 }
-                              }
-                              else
-                              {
-                                 MessageBox.Show(String.Format("Unknown meta data: {0} = {1}", key, value));
-                              }
+                              MessageBox.Show(String.Format("Unknown meta data: {0} = {1}", key, value));
                               break;
                         }
                      }
@@ -177,11 +151,6 @@ namespace EdwardScissorhands
 
             string pdfFilename = Path.Combine(Path.GetDirectoryName(m_filename), Path.GetFileNameWithoutExtension(m_filename) + ".pdf");
             masterDoc.SaveAs2(pdfFilename, WdSaveFormat.wdFormatPDF);
-
-            if (htmlGenerator.Enabled)
-            {
-               htmlGenerator.Generate ( masterDoc, Path.Combine(Path.GetDirectoryName(m_filename), Path.GetFileNameWithoutExtension(m_filename) ) );
-            }
          }
          finally
          {
