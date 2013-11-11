@@ -8,18 +8,11 @@ namespace SeqZapManualGenerator
 {
    public class HtmlGenerator
    {
-      private List<string> m_externalStyles = new List<string>();
-
       public int SmallestLevel { get; set; }
 
       public HtmlGenerator()
       {
          SmallestLevel = 3;
-      }
-
-      public void AddExternalStyle(string style)
-      {
-         m_externalStyles.Add(style);
       }
 
       private void HtmlStart(TextWriter writer, string title, string author)
@@ -28,10 +21,7 @@ namespace SeqZapManualGenerator
          writer.WriteLine("<html>");
          writer.WriteLine("<head>");
          writer.WriteLine("<meta charset=\"utf-8\">");
-         foreach (string externalCss in m_externalStyles)
-         {
-            writer.WriteLine("<style type=\"text/css\" src=\"{0}\">", externalCss);
-         }
+         writer.WriteLine("<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">");
          writer.WriteLine("<title>{0}</title>", title);
          writer.WriteLine("</head>");
          writer.WriteLine("<body>");
@@ -81,6 +71,8 @@ namespace SeqZapManualGenerator
          //string author = document.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyAuthor].Value;
          string title = "NO TITLE";
          string author = "NO AUTHOR";
+         File.WriteAllText(Path.Combine(baseDirectory, "style.css"), Properties.Resources.style);
+         
          using (TextWriter tocWriter = new StreamWriter(Path.Combine(baseDirectory, "toc.html")))
          {
             HtmlStart(tocWriter, title + " - Table of contents", author);
@@ -144,7 +136,9 @@ namespace SeqZapManualGenerator
          {
             _writer.WriteLine("<h{0} id=\"{2}\">{1}</h{0}>", _item.Level, _item.Title, id);
          }
+         _writer.WriteLine("<div class=\"content\">");
          _writer.WriteLine(_item.TextContent);
+         _writer.WriteLine("</div");
       }
 
       /*
