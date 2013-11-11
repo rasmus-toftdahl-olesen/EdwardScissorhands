@@ -63,7 +63,28 @@ namespace SeqZapManualGenerator.Properties {
         /// <summary>
         ///   Looks up a localized string similar to body
         ///{
-        ///font-family: Corbel, sans-serif;	
+        ///    font-family: Corbel, sans-serif;	
+        ///    margin: 0;
+        ///    padding: 0;
+        ///}
+        ///a
+        ///{
+        ///    text-decoration: underline;
+        ///    color: #C00000;
+        ///}
+        ///body .nav
+        ///{
+        ///    background-color: #C00000;
+        ///    padding: 5px;
+        ///}
+        ///body .nav a
+        ///{
+        ///    color: white;
+        ///    font-weight: bold;
+        ///}
+        ///body .content
+        ///{
+        ///    padding-left: 1em;
         ///}
         ///.
         /// </summary>

@@ -17,10 +17,14 @@ namespace SeqZapManualGenerator
             OutlineItem document = Edward.LoadAndOutline(inputFile);
             HtmlGenerator htmlGenerator = new HtmlGenerator();
             CsGenerator csGenerator = new CsGenerator();
-            
+
             htmlGenerator.Generate(document, Path.Combine(Path.GetDirectoryName(inputFile), Path.GetFileNameWithoutExtension(inputFile)));
             
             csGenerator.ClassName = Path.GetFileNameWithoutExtension(inputFile);
+            if (args.Length > 1)
+            {
+               csGenerator.Namespace = args[1];
+            }
             csGenerator.Geneate(document, Path.Combine(Path.GetDirectoryName(inputFile), csGenerator.ClassName + ".cs"));
          }
          finally

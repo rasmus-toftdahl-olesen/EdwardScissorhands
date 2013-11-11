@@ -40,7 +40,7 @@ namespace LibEdward
             }
             else
             {
-               return m_title.Range.Text;
+               return m_title.Range.Text.Trim();
             }
          }
          /*
@@ -69,8 +69,15 @@ namespace LibEdward
             }
             else
             {
-               Range contentRange = m_range.Document.Range(m_title.Range.End, m_children[0].Content.Start - 1);
-               return contentRange.Text;
+               if (m_title.Range.End == m_children[0].Content.Start)
+               {
+                  return String.Empty;
+               }
+               else
+               {
+                  Range contentRange = m_range.Document.Range(m_title.Range.End, m_children[0].Content.Start - 1);
+                  return contentRange.Text;
+               }
             }
          }
       }

@@ -59,6 +59,11 @@ namespace SeqZapManualGenerator
          string filename;
          string id;
          HtmlGenerator.GenerateFilenameAndId(_item, this.SmallestLevel, out filename, out id);
+         if (filename.Length == 0)
+         {
+            return;
+         }
+         
          if (_item.Level > this.SmallestLevel)
          {
             _writer.WriteLine("      public static readonly Bookmark {0}_{1} = new Bookmark( s_instance, \"{2}\", \"{3}\" );", Capitalize(filename.Replace('-', '_')), Capitalize(id.Replace('-', '_')), filename, id);
