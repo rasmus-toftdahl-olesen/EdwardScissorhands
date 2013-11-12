@@ -9,7 +9,8 @@ namespace SeqZapManualGenerator
    public class HtmlGenerator
    {
       public int SmallestLevel { get; set; }
-
+      public string BaseDirectory { get; set; }
+      
       public HtmlGenerator()
       {
          SmallestLevel = 3;
@@ -59,34 +60,36 @@ namespace SeqZapManualGenerator
          return ret.ToString();
       }
 
-      public void Generate(OutlineItem document, string baseDirectory)
+      public void Generate(OutlineItem document, string _baseDirectory)
       {
-         if (Directory.Exists(baseDirectory))
+         BaseDirectory = _baseDirectory;
+         
+         if (Directory.Exists(BaseDirectory))
          {
-            Directory.Delete(baseDirectory, true);
+            Directory.Delete(BaseDirectory, true);
          }
-         Directory.CreateDirectory(baseDirectory);
+         Directory.CreateDirectory(BaseDirectory);
 
          //string title = document.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyTitle].Value;
          //string author = document.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyAuthor].Value;
          string title = "NO TITLE";
          string author = "NO AUTHOR";
-         File.WriteAllText(Path.Combine(baseDirectory, "style.css"), Properties.Resources.style);
+         File.WriteAllText(Path.Combine(BaseDirectory, "style.css"), Properties.Resources.style);
 
-         using (TextWriter tocWriter = new StreamWriter(Path.Combine(baseDirectory, "toc.html")))
+         using (TextWriter tocWriter = new StreamWriter(Path.Combine(BaseDirectory, "toc.html")))
          {
             HtmlStart(tocWriter, title + " - Table of contents", author);
             tocWriter.WriteLine("<ul>");
             foreach (OutlineItem child in document.Children)
             {
-               GenerateItem(child, baseDirectory, tocWriter, null, "toc");
+               GenerateItem(child, tocWriter, null, "toc");
             }
             tocWriter.WriteLine("</ul>");
             HtmlEnd(tocWriter);
          }
       }
 
-      private void GenerateItem(OutlineItem item, string baseDirectory, TextWriter tocWriter,  TextWriter parentWriter, string parentFilename)
+      private void GenerateItem(OutlineItem item, TextWriter tocWriter, TextWriter parentWriter, string parentFilename)
       {
          string filename;
          string id;
@@ -97,20 +100,21 @@ namespace SeqZapManualGenerator
             return;
          }
 
-         using (TextWriter writer = new StreamWriter(Path.Combine(baseDirectory, filename + ".html")))
+         using (TextWriter writer = new StreamWriter(Path.Combine(BaseDirectory, filename + ".html")))
          {
             HtmlStart(writer, item.Title, "NO AUTHOR");
             writer.WriteLine("<div class=\"nav\">");
             string fullname = null;
+            writer.Write("<a href=\"toc.html\">TOC</a>");
             foreach (KeyValuePair<string, OutlineItem> heritageItem in heritage)
             {
+               writer.Write(" &raquo; ");
                if (fullname == null)
                {
                   fullname = heritageItem.Key;
                }
                else
                {
-                  writer.Write(" &raquo; ");
                   fullname = fullname + "-" + heritageItem.Key;
                }
                if (heritageItem.Value != null)
@@ -161,11 +165,11 @@ namespace SeqZapManualGenerator
                tocWriter.WriteLine("<ul>");
                foreach (OutlineItem child in item.Children)
                {
-                  GenerateItem(child, baseDirectory, tocWriter, writer, filename);
+                  GenerateItem(child, tocWriter, writer, filename);
                }
                tocWriter.WriteLine("</ul>");
                writer.WriteLine("</ul>");
-               writer.WriteLine("</div");
+               writer.WriteLine("</div>");
             }
             else
             {
@@ -195,22 +199,49 @@ namespace SeqZapManualGenerator
             _writer.WriteLine("<h{0} id=\"{2}\">{1}</h{0}>", _item.Level, _item.Title, id);
          }
          _writer.WriteLine("<div class=\"content\">");
-         _writer.WriteLine(_item.TextContent);
-         _writer.WriteLine("</div");
-      }
+         foreach (Content content in _item.Content)
+         {
+            switch (content.Type)
+            {
+               case ContentType.Text:
+                  _writer.WriteLine(content.AsText.Text);
+                  break;
 
-      /*
-      foreach (Paragraph paragraph in document.Paragraphs)
-      {
-         int outlineLevel = (int) paragraph.OutlineLevel;
-         if (outlineLevel == (int) WdOutlineLevel.wdOutlineLevelBodyText)
-         {
-            currentWriter.WriteLine("<p>{0}</p>", paragraph.Range.Text);
+               case ContentType.ImagePng:
+                  {
+                     PngImageContent image = content.AsPngImage;
+                     string imageFileName = SaveImage(image);
+                     _writer.WriteLine("<figure>");
+                     _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" />", imageFileName, image.AltText);
+                     if (!String.IsNullOrEmpty(image.Title))
+                     {
+                        _writer.WriteLine("<figcaption>{0}</figcaption>", image.Title);
+                     }
+                     _writer.WriteLine("</figure>");
+                  }
+                  break;
+
+               case ContentType.Table:
+                  {
+                     _writer.WriteLine("<table>");
+                     TableContent table = content.AsTable;
+                     for (int row = 0 ; row < table.Rows ; row++)
+                     {
+                        _writer.Write("  <tr>");
+                        for (int column = 0 ; column < table.Columns ; column++)
+                        {
+                           string text = table.CellText(row, column);
+                           _writer.Write("<td>{0}</td>", text);
+                        }
+                        _writer.WriteLine("</tr>");
+                     }
+                     _writer.WriteLine("</table>");
+                  }
+                  break;
+            }
          }
-         else
-         {
+         _writer.WriteLine("</div>");
       }
-*/
 
       public static void GenerateFilenameAndId(OutlineItem _item, int smallestLevel, out string _filename, out string _id)
       {
@@ -268,6 +299,24 @@ namespace SeqZapManualGenerator
             current = current.Parent;
          }
          return stack;
+      }
+
+      private int m_nextImageIndex = 0;
+      private string SaveImage(PngImageContent _image)
+      {
+         string imageDir = Path.Combine ( BaseDirectory, "images" );
+         if ( !Directory.Exists(imageDir) )
+         {
+            Directory.CreateDirectory ( imageDir );
+         }
+         int imageIndex = m_nextImageIndex++;
+         string imageFilename = String.Format("image{0:000000}.png",  imageIndex );
+         string fullImageFilename = Path.Combine(imageDir, imageFilename);
+         using (FileStream stream = new FileStream(fullImageFilename, FileMode.Create))
+         {
+            _image.Write(stream);
+         }
+         return "images/" + imageFilename;
       }
    }
 }

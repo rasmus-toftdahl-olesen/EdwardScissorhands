@@ -34,3 +34,19 @@ body .content
 {
     padding-left: 1em;
 }
+
+table
+{
+    border: 1px solid #595959;
+    border-collapse: collapse;
+}
+table td
+{
+    border: 1px solid #595959;
+    padding: 0.15cm;
+}
+table th
+{
+    background-color: #595959;
+    color: white;
+}

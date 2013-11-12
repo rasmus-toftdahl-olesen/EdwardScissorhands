@@ -217,3 +217,5 @@ pip-log.txt
 # Ignore generated files
 Test1/Test1.docx
 Test1/Test1.pdf
+Test1/Test1.cs
+Test1/Test1

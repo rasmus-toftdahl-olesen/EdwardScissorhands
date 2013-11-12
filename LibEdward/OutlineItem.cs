@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Office.Interop.Word;
+using System.Windows.Forms;
 
 namespace LibEdward
 {
@@ -10,6 +11,7 @@ namespace LibEdward
       private Document m_document;
       private Paragraph m_title;
       private Range m_range;
+      private Range m_contentRange;
       private OutlineItem m_parent;
       private List<OutlineItem> m_children;
       private int m_startParagraphIndex;
@@ -54,30 +56,52 @@ namespace LibEdward
          }
           */
       }
-      public Range Content { get { return m_range; } }
+      public Range Range { get { return m_range; } }
       public OutlineItem Parent { get { return m_parent; } }
       public IList<OutlineItem> Children { get { return m_children; } }
+
+      public Range ContentRange
+      {
+         get
+         {
+            if (m_contentRange == null)
+            {
+               if (m_title == null)
+               {
+                  return null;
+               }
+               if (m_children.Count == 0)
+               {
+                  m_contentRange = m_range.Document.Range(m_title.Range.End, m_range.End);
+               }
+               else
+               {
+                  if (m_title.Range.End == m_children[0].Range.Start)
+                  {
+                     return null;
+                  }
+                  else
+                  {
+                     m_contentRange = m_range.Document.Range(m_title.Range.End, m_children[0].Range.Start - 1);
+                  }
+               }
+            }
+            return m_contentRange;
+         }
+      }
 
       public string TextContent
       {
          get
          {
-            if (m_children.Count == 0)
+            Range cRange = this.ContentRange;
+            if (cRange == null)
             {
-               Range contentRange = m_range.Document.Range(m_title.Range.End, m_range.End);
-               return contentRange.Text;
+               return String.Empty;
             }
             else
             {
-               if (m_title.Range.End == m_children[0].Content.Start)
-               {
-                  return String.Empty;
-               }
-               else
-               {
-                  Range contentRange = m_range.Document.Range(m_title.Range.End, m_children[0].Content.Start - 1);
-                  return contentRange.Text;
-               }
+               return cRange.Text;
             }
          }
       }
@@ -185,6 +209,70 @@ namespace LibEdward
       {
          m_range = m_range.Document.Range(m_range.Start, _newEnd);
          m_endParagraphIndex = _endParagraph;
+      }
+
+      public IEnumerable<Content> Content
+      {
+         get
+         {
+            Range cRange = this.ContentRange;
+            if (cRange != null)
+            {
+               List<KeyValuePair<Range, Content>> usedRanges = new List<KeyValuePair<Range, Content>>();
+               if (cRange.Tables.Count > 0)
+               {
+                  foreach (Table table in cRange.Tables)
+                  {
+                     usedRanges.Add(new KeyValuePair<Range, Content>(table.Range, new TableContent(table)));
+                  }
+               }
+               if (cRange.InlineShapes.Count > 0)
+               {
+                  foreach (InlineShape inlineShape in cRange.InlineShapes)
+                  {
+                     inlineShape.Range.CopyAsPicture();
+                     object pngData = Clipboard.GetData("PNG");
+                     if (pngData is System.IO.MemoryStream)
+                     {
+                        usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new PngImageContent((System.IO.MemoryStream) pngData, inlineShape.AlternativeText, inlineShape.Title)));
+                     }
+                     else
+                     {
+                        usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new TextContent(String.Format("INTERNAL ERROR: Could not convert shape to PNG image."))));
+                     }
+                  }
+               }
+
+               if (usedRanges.Count > 0)
+               {
+                  usedRanges.Sort(new Comparison<KeyValuePair<Range, Content>>(SortRanges));
+
+                  int currentEnd = cRange.Start;
+                  foreach (KeyValuePair<Range, Content> item in usedRanges)
+                  {
+                     if (item.Key.Start != currentEnd)
+                     {
+                        yield return new TextContent(item.Key.Document.Range(currentEnd, item.Key.Start).Text);
+                     }
+                     yield return item.Value;
+                     currentEnd = item.Key.End;
+                  }
+                  if (currentEnd != cRange.End)
+                  {
+                     yield return new TextContent(cRange.Document.Range(currentEnd, cRange.End).Text);
+                  }
+               }
+               else
+               {
+                  yield return new TextContent(cRange.Text);
+               }
+            }
+         }
+      }
+
+      private static int SortRanges(KeyValuePair<Range, Content> a, KeyValuePair<Range, Content> b)
+      {
+         return a.Key.Start.CompareTo(b.Key.Start);
       }
    }
 }

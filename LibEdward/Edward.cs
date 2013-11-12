@@ -64,7 +64,7 @@ namespace LibEdward
 
       public static OutlineItem Refresh(OutlineItem item)
       {
-         return Outline(item.Content.Document);
+         return Outline(item.Range.Document);
       }
       
       public static OutlineItem Outline(Document document)
