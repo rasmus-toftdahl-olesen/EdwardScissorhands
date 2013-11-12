@@ -10,7 +10,7 @@ namespace SeqZapManualGenerator
    {
       public int SmallestLevel { get; set; }
       public string BaseDirectory { get; set; }
-      
+
       public HtmlGenerator()
       {
          SmallestLevel = 3;
@@ -63,22 +63,21 @@ namespace SeqZapManualGenerator
       public void Generate(OutlineItem document, string _baseDirectory)
       {
          BaseDirectory = _baseDirectory;
-         
+
          if (Directory.Exists(BaseDirectory))
          {
             Directory.Delete(BaseDirectory, true);
          }
          Directory.CreateDirectory(BaseDirectory);
 
-         //string title = document.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyTitle].Value;
-         //string author = document.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyAuthor].Value;
-         string title = "NO TITLE";
+         string title = document.Title;
          string author = "NO AUTHOR";
          File.WriteAllText(Path.Combine(BaseDirectory, "style.css"), Properties.Resources.style);
 
          using (TextWriter tocWriter = new StreamWriter(Path.Combine(BaseDirectory, "toc.html")))
          {
-            HtmlStart(tocWriter, title + " - Table of contents", author);
+            //HtmlStart(tocWriter, title + " - Table of contents", author);
+            HtmlStart(tocWriter, "Table of contents", author);
             tocWriter.WriteLine("<ul>");
             foreach (OutlineItem child in document.Children)
             {
@@ -157,7 +156,7 @@ namespace SeqZapManualGenerator
                parentWriter.Write("<li><a href=\"{0}.html\">{1}</a>", filename, item.Title);
             }
             tocWriter.Write("<li><a href=\"{0}.html\">{1}</a>", filename, item.Title);
-            HtmlItem(item, writer);
+            HtmlItem(item, writer, item.Level);
             if (item.Level < this.SmallestLevel)
             {
                writer.WriteLine("<div class=\"children\">");
@@ -175,7 +174,7 @@ namespace SeqZapManualGenerator
             {
                foreach (OutlineItem child in item.Children)
                {
-                  HtmlItem(child, writer);
+                  HtmlItemRecursively(child, writer, item.Level);
                }
             }
             tocWriter.WriteLine("</li>");
@@ -183,7 +182,16 @@ namespace SeqZapManualGenerator
          }
       }
 
-      private void HtmlItem(OutlineItem _item, TextWriter _writer)
+      private void HtmlItemRecursively(OutlineItem _item, TextWriter _writer, int _topLevel)
+      {
+         HtmlItem(_item, _writer, _topLevel);
+         foreach (OutlineItem child in _item.Children)
+         {
+            HtmlItemRecursively(child, _writer, _topLevel);
+         }
+      }
+
+      private void HtmlItem(OutlineItem _item, TextWriter _writer, int _topLevel)
       {
          string filename;
          string id;
@@ -192,32 +200,63 @@ namespace SeqZapManualGenerator
 
          if (String.IsNullOrEmpty(id))
          {
-            _writer.WriteLine("<h{0}>{1}</h{0}>", _item.Level, _item.Title);
+            _writer.WriteLine("<h{0}>{1}</h{0}>", _item.Level - _topLevel + 1, _item.Title);
          }
          else
          {
-            _writer.WriteLine("<h{0} id=\"{2}\">{1}</h{0}>", _item.Level, _item.Title, id);
+            _writer.WriteLine("<h{0} id=\"{2}\">{1}</h{0}>", _item.Level - _topLevel + 1, _item.Title, id);
          }
          _writer.WriteLine("<div class=\"content\">");
+         List<string> listLevels = new List<string>();
          foreach (Content content in _item.Content)
          {
             switch (content.Type)
             {
                case ContentType.Text:
-                  _writer.WriteLine(content.AsText.Text);
+                  {
+                     TextContent text = content.AsText;
+                     while (listLevels.Count != text.ListLevel)
+                     {
+                        if (listLevels.Count > text.ListLevel)
+                        {
+                           _writer.WriteLine("</{0}>", listLevels[listLevels.Count - 1]);
+                           listLevels.RemoveAt(listLevels.Count - 1);
+                        }
+                        else
+                        {
+                           if (text.NumberedList)
+                           {
+                              listLevels.Add("ol");
+                           }
+                           else
+                           {
+                              listLevels.Add("ul");
+                           }
+                           _writer.WriteLine("<{0}>", listLevels[listLevels.Count - 1]);
+                        }
+                     }
+                     if (listLevels.Count == 0)
+                     {
+                        _writer.WriteLine(text.Text);
+                     }
+                     else
+                     {
+                        _writer.WriteLine("<li>{0}</li>", text.Text);
+                     }
+                  }
                   break;
 
                case ContentType.ImagePng:
                   {
                      PngImageContent image = content.AsPngImage;
                      string imageFileName = SaveImage(image);
-                     _writer.WriteLine("<figure>");
+                     _writer.WriteLine("<div class=\"figure\">");
                      _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" />", imageFileName, image.AltText);
                      if (!String.IsNullOrEmpty(image.Title))
                      {
-                        _writer.WriteLine("<figcaption>{0}</figcaption>", image.Title);
+                        _writer.WriteLine("<div class=\"figcaption\">{0}</div>", image.Title);
                      }
-                     _writer.WriteLine("</figure>");
+                     _writer.WriteLine("</div>");
                   }
                   break;
 
@@ -304,13 +343,13 @@ namespace SeqZapManualGenerator
       private int m_nextImageIndex = 0;
       private string SaveImage(PngImageContent _image)
       {
-         string imageDir = Path.Combine ( BaseDirectory, "images" );
-         if ( !Directory.Exists(imageDir) )
+         string imageDir = Path.Combine(BaseDirectory, "images");
+         if (!Directory.Exists(imageDir))
          {
-            Directory.CreateDirectory ( imageDir );
+            Directory.CreateDirectory(imageDir);
          }
          int imageIndex = m_nextImageIndex++;
-         string imageFilename = String.Format("image{0:000000}.png",  imageIndex );
+         string imageFilename = String.Format("image{0:000000}.png", imageIndex);
          string fullImageFilename = Path.Combine(imageDir, imageFilename);
          using (FileStream stream = new FileStream(fullImageFilename, FileMode.Create))
          {

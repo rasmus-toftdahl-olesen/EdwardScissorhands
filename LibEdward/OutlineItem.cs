@@ -38,7 +38,11 @@ namespace LibEdward
          {
             if (m_title == null)
             {
-               return m_document.Name;
+               /*
+               dynamic d = m_document.BuiltInDocumentProperties;
+               return d[WdBuiltInProperty.wdPropertyTitle].Value;
+               */
+               return "NO TITLE";
             }
             else
             {
@@ -219,34 +223,35 @@ namespace LibEdward
             if (cRange != null)
             {
                List<KeyValuePair<Range, Content>> usedRanges = new List<KeyValuePair<Range, Content>>();
-               if (cRange.Tables.Count > 0)
+               foreach (Table table in cRange.Tables)
                {
-                  foreach (Table table in cRange.Tables)
-                  {
-                     usedRanges.Add(new KeyValuePair<Range, Content>(table.Range, new TableContent(table)));
-                  }
-               }
-               if (cRange.InlineShapes.Count > 0)
-               {
-                  foreach (InlineShape inlineShape in cRange.InlineShapes)
-                  {
-                     inlineShape.Range.CopyAsPicture();
-                     object pngData = Clipboard.GetData("PNG");
-                     if (pngData is System.IO.MemoryStream)
-                     {
-                        usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new PngImageContent((System.IO.MemoryStream) pngData, inlineShape.AlternativeText, inlineShape.Title)));
-                     }
-                     else
-                     {
-                        usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new TextContent(String.Format("INTERNAL ERROR: Could not convert shape to PNG image."))));
-                     }
-                  }
+                  usedRanges.Add(new KeyValuePair<Range, Content>(table.Range, new TableContent(table)));
                }
 
+               foreach (InlineShape inlineShape in cRange.InlineShapes)
+               {
+                  inlineShape.Range.CopyAsPicture();
+                  object pngData = Clipboard.GetData("PNG");
+                  if (pngData is System.IO.MemoryStream)
+                  {
+                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new PngImageContent((System.IO.MemoryStream) pngData, inlineShape.AlternativeText, inlineShape.Title)));
+                  }
+                  else
+                  {
+                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new TextContent(String.Format("INTERNAL ERROR: Could not convert shape to PNG image."))));
+                  }
+                  Clipboard.Clear();
+               }
+
+               foreach (Paragraph paragraph in cRange.ListParagraphs)
+               {
+                  usedRanges.Add(new KeyValuePair<Range, Content>(paragraph.Range, new TextContent(paragraph.Range.Text, paragraph.Range.ListFormat.ListLevelNumber, paragraph.Range.ListFormat.ListType)));
+               }
+               
                if (usedRanges.Count > 0)
                {
                   usedRanges.Sort(new Comparison<KeyValuePair<Range, Content>>(SortRanges));
-
+                  
                   int currentEnd = cRange.Start;
                   foreach (KeyValuePair<Range, Content> item in usedRanges)
                   {
