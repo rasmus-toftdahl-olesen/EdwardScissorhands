@@ -23,7 +23,7 @@ namespace LibEdward
 
       public string CellText(int _row, int _column)
       {
-         string text = m_table.Cell(_row, _column).Range.Text;
+         string text = m_table.Cell(_row + 1, _column + 1).Range.Text;
          return text.TrimEnd('\r', '\a');
       }
    }
