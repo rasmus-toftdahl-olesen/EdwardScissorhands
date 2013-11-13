@@ -27,11 +27,12 @@ namespace SeqZapManualGenerator
 
          using (TextWriter csWriter = new StreamWriter(_outputFilename))
          {
+            csWriter.WriteLine("using Sequanto.Manual;");
             csWriter.WriteLine("using SeqZap.Manual;");
             csWriter.WriteLine();
             csWriter.WriteLine("namespace {0}", Namespace);
             csWriter.WriteLine("{");
-            csWriter.WriteLine("   public class {0} : ISeqZapManual", ClassName);
+            csWriter.WriteLine("   public class {0} : IManual", ClassName);
             csWriter.WriteLine("   {");
             csWriter.WriteLine("      private static readonly {0} s_instance = new {0} ();", ClassName);
             csWriter.WriteLine("      private {0} ()", ClassName);
