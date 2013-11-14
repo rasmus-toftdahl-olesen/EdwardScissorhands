@@ -210,73 +210,99 @@ namespace SeqZapManualGenerator
          List<string> listLevels = new List<string>();
          foreach (Content content in _item.Content)
          {
-            switch (content.Type)
+            try
             {
-               case ContentType.Text:
-                  {
-                     TextContent text = content.AsText;
-                     while (listLevels.Count != text.ListLevel)
+               switch (content.Type)
+               {
+                  case ContentType.Text:
                      {
-                        if (listLevels.Count > text.ListLevel)
+                        TextContent text = content.AsText;
+                        while (listLevels.Count != text.ListLevel)
                         {
-                           _writer.WriteLine("</{0}>", listLevels[listLevels.Count - 1]);
-                           listLevels.RemoveAt(listLevels.Count - 1);
-                        }
-                        else
-                        {
-                           if (text.NumberedList)
+                           if (listLevels.Count > text.ListLevel)
                            {
-                              listLevels.Add("ol");
+                              _writer.WriteLine("</{0}>", listLevels[listLevels.Count - 1]);
+                              listLevels.RemoveAt(listLevels.Count - 1);
                            }
                            else
                            {
-                              listLevels.Add("ul");
+                              if (text.NumberedList)
+                              {
+                                 listLevels.Add("ol");
+                              }
+                              else
+                              {
+                                 listLevels.Add("ul");
+                              }
+                              _writer.WriteLine("<{0}>", listLevels[listLevels.Count - 1]);
                            }
-                           _writer.WriteLine("<{0}>", listLevels[listLevels.Count - 1]);
                         }
-                     }
-                     if (listLevels.Count == 0)
-                     {
-                        _writer.WriteLine(text.Text);
-                     }
-                     else
-                     {
-                        _writer.WriteLine("<li>{0}</li>", text.Text);
-                     }
-                  }
-                  break;
-
-               case ContentType.ImagePng:
-                  {
-                     PngImageContent image = content.AsPngImage;
-                     string imageFileName = SaveImage(image);
-                     _writer.WriteLine("<div class=\"figure\">");
-                     _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" />", imageFileName, image.AltText);
-                     if (!String.IsNullOrEmpty(image.Title))
-                     {
-                        _writer.WriteLine("<div class=\"figcaption\">{0}</div>", image.Title);
-                     }
-                     _writer.WriteLine("</div>");
-                  }
-                  break;
-
-               case ContentType.Table:
-                  {
-                     _writer.WriteLine("<table>");
-                     TableContent table = content.AsTable;
-                     for (int row = 0 ; row < table.Rows ; row++)
-                     {
-                        _writer.Write("  <tr>");
-                        for (int column = 0 ; column < table.Columns ; column++)
+                        if (listLevels.Count == 0)
                         {
-                           string text = table.CellText(row, column);
-                           _writer.Write("<td>{0}</td>", text);
+                           _writer.WriteLine(text.Text);
                         }
-                        _writer.WriteLine("</tr>");
+                        else
+                        {
+                           _writer.WriteLine("<li>{0}</li>", text.Text);
+                        }
                      }
-                     _writer.WriteLine("</table>");
-                  }
-                  break;
+                     break;
+
+                  case ContentType.ImagePng:
+                     {
+                        PngImageContent image = content.AsPngImage;
+                        string imageFileName = SaveImage(image);
+                        _writer.WriteLine("<div class=\"figure\">");
+                        _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" />", imageFileName, image.AltText);
+                        if (!String.IsNullOrEmpty(image.Title))
+                        {
+                           _writer.WriteLine("<div class=\"figcaption\">{0}</div>", image.Title);
+                        }
+                        _writer.WriteLine("</div>");
+                     }
+                     break;
+
+                  case ContentType.Table:
+                     {
+                        _writer.WriteLine("<table>");
+                        TableContent table = content.AsTable;
+                        foreach (TableContent.Row row in table.Rows)
+                        {
+                           string tag = "td";
+                           if (row.IsHeading)
+                           {
+                              tag = "th";
+                           }
+                           _writer.Write("  <tr>");
+                           foreach (TableContent.Cell cell in row.Cells)
+                           {
+                              int colSpan = cell.ColumnSpan;
+                              string text = cell.Text;
+                              if (colSpan > 1)
+                              {
+                                 _writer.Write("<{0} colspan=\"{2}\">{1}</{0}>", tag, text, colSpan);
+                              }
+                              else
+                              {
+                                 _writer.Write("<{0}>{1}</{0}>", tag, text);
+                              }
+                           }
+                           _writer.WriteLine("</tr>");
+                        }
+                        _writer.WriteLine("</table>");
+                     }
+                     break;
+               }
+            }
+            catch (Exception ex)
+            {
+               _writer.WriteLine ( "<div class=\"seqzap-manual-generator-error\">" );
+               _writer.WriteLine("<h1>While trying to generate {0}</h1>", content.Type);
+               _writer.WriteLine("<h2>Message</h2>" );
+               _writer.WriteLine("<p>{0}</p>", ex.Message);
+               _writer.WriteLine("<h2>Stacktrace</h2>");
+               _writer.WriteLine("<pre>{0}</pre>", ex.StackTrace);
+               _writer.WriteLine("</div>");
             }
          }
          _writer.WriteLine("</div>");
