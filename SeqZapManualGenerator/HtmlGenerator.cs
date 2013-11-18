@@ -70,8 +70,8 @@ namespace SeqZapManualGenerator
          }
          Directory.CreateDirectory(BaseDirectory);
 
-         string title = document.Title;
-         string author = "NO AUTHOR";
+         string title = Program.GetTitle(document);
+         string author = Program.GetAuthor(document);
          File.WriteAllText(Path.Combine(BaseDirectory, "style.css"), Properties.Resources.style);
 
          using (TextWriter tocWriter = new StreamWriter(Path.Combine(BaseDirectory, "toc.html")))

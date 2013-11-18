@@ -22,8 +22,8 @@ namespace SeqZapManualGenerator
 
       public void Geneate(OutlineItem _document, string _outputFilename)
       {
-         string title = "NO TITLE";
-         string author = "NO AUTHOR";
+         string title = Program.GetTitle(_document);
+         string author = Program.GetAuthor(_document);
 
          using (TextWriter csWriter = new StreamWriter(_outputFilename))
          {

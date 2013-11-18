@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows.Forms;
 
 using LibEdward;
+using Microsoft.Office.Interop.Word;
 
 namespace SeqZapManualGenerator
 {
@@ -13,36 +14,37 @@ namespace SeqZapManualGenerator
       [STAThread]
       public static void Main(string[] args)
       {
-         //Application.EnableVisualStyles();
-         //Application.SetCompatibleTextRenderingDefault(false);
-
-         //Form form = new Form();
-         //form.Load += new  EventHandler(delegate(object o, EventArgs a)
+         string inputFile = Path.GetFullPath(args[0]);
+         try
          {
-            string inputFile = Path.GetFullPath(args[0]);
-            try
+
+            OutlineItem document = Edward.LoadAndOutline(inputFile);
+            HtmlGenerator htmlGenerator = new HtmlGenerator();
+            CsGenerator csGenerator = new CsGenerator();
+
+            htmlGenerator.Generate(document, Path.Combine(Path.GetDirectoryName(inputFile), Path.GetFileNameWithoutExtension(inputFile)));
+
+            csGenerator.ClassName = Path.GetFileNameWithoutExtension(inputFile);
+            if (args.Length > 1)
             {
-
-               OutlineItem document = Edward.LoadAndOutline(inputFile);
-               HtmlGenerator htmlGenerator = new HtmlGenerator();
-               CsGenerator csGenerator = new CsGenerator();
-
-               htmlGenerator.Generate(document, Path.Combine(Path.GetDirectoryName(inputFile), Path.GetFileNameWithoutExtension(inputFile)));
-
-               csGenerator.ClassName = Path.GetFileNameWithoutExtension(inputFile);
-               if (args.Length > 1)
-               {
-                  csGenerator.Namespace = args[1];
-               }
-               csGenerator.Geneate(document, Path.Combine(Path.GetDirectoryName(inputFile), csGenerator.ClassName + ".cs"));
+               csGenerator.Namespace = args[1];
             }
-            finally
-            {
-               Edward.StopWord();
-            }
+            csGenerator.Geneate(document, Path.Combine(Path.GetDirectoryName(inputFile), csGenerator.ClassName + ".cs"));
          }
-         //});
-         //Application.Run(form);
+         finally
+         {
+            Edward.StopWord();
+         }
+      }
+
+      public static string GetTitle(OutlineItem _item)
+      {
+         return _item.Document.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyTitle].Value;
+      }
+
+      public static string GetAuthor(OutlineItem _item)
+      {
+         return _item.Document.BuiltInDocumentProperties[WdBuiltInProperty.wdPropertyAuthor].Value;
       }
    }
 }

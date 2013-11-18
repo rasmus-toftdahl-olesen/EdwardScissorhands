@@ -38,10 +38,6 @@ namespace LibEdward
          {
             if (m_title == null)
             {
-               /*
-               dynamic d = m_document.BuiltInDocumentProperties;
-               return d[WdBuiltInProperty.wdPropertyTitle].Value;
-               */
                return "NO TITLE";
             }
             else
@@ -94,6 +90,14 @@ namespace LibEdward
          }
       }
 
+      public Document Document
+      {
+         get
+         {
+            return m_range.Document;
+         }
+      }
+      
       public string TextContent
       {
          get

@@ -76,17 +76,31 @@ namespace SeqZapManualGenerator.Properties {
         ///{
         ///    background-color: #C00000;
         ///    padding: 5px;
+        ///    color: white;
+        ///    font-weight: bold;
         ///}
         ///body .nav a
         ///{
         ///    color: white;
-        ///    font-weight: bold;
+        ///}
+        ///body .nav .relational
+        ///{
+        ///    position: fixed;
+        ///    top: 5px;
+        ///    right: 5px;
+        ///}
+        ///body .nav .relational a
+        ///{
+        ///    text-align: right;
         ///}
         ///body .content
         ///{
         ///    padding-left: 1em;
         ///}
-        ///.
+        ///
+        ///table
+        ///{
+        ///    border: 1px solid [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string style {
             get {
