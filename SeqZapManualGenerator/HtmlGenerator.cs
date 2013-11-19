@@ -92,8 +92,9 @@ namespace SeqZapManualGenerator
       {
          string filename;
          string id;
+         string csharpName;
          LinkedList<KeyValuePair<string, OutlineItem>> heritage = GetHeritage(item);
-         GenerateFilenameAndId(heritage, this.SmallestLevel, out filename, out id);
+         GenerateFilenameAndId(heritage, this.SmallestLevel, out filename, out id, out csharpName);
          if (filename.Length == 0)
          {
             return;
@@ -310,13 +311,20 @@ namespace SeqZapManualGenerator
 
       public static void GenerateFilenameAndId(OutlineItem _item, int smallestLevel, out string _filename, out string _id)
       {
-         GenerateFilenameAndId(GetHeritage(_item), smallestLevel, out _filename, out _id);
+         string csharpName;
+         GenerateFilenameAndId(GetHeritage(_item), smallestLevel, out _filename, out _id, out csharpName);
       }
 
-      private static void GenerateFilenameAndId(LinkedList<KeyValuePair<string, OutlineItem>> _stack, int smallestLevel, out string _filename, out string _id)
+      public static void GenerateFilenameAndId(OutlineItem _item, int smallestLevel, out string _filename, out string _id, out string _csharpName)
+      {
+         GenerateFilenameAndId(GetHeritage(_item), smallestLevel, out _filename, out _id, out _csharpName);
+      }
+
+      private static void GenerateFilenameAndId(LinkedList<KeyValuePair<string, OutlineItem>> _stack, int smallestLevel, out string _filename, out string _id, out string _csharpName)
       {
          string filename = "";
          string id = "";
+         string csharpName = "";
          int i = 0;
 
          i = 0;
@@ -327,10 +335,12 @@ namespace SeqZapManualGenerator
                if (filename.Length == 0)
                {
                   filename = stackItem.Key;
+                  csharpName = Capitalize(stackItem.Key);
                }
                else
                {
                   filename = filename + "-" + stackItem.Key;
+                  csharpName = csharpName + "_" + Capitalize(stackItem.Key);
                }
             }
             else
@@ -343,11 +353,13 @@ namespace SeqZapManualGenerator
                {
                   id = id + "-" + stackItem.Key;
                }
+               csharpName = csharpName + "_" + Capitalize(stackItem.Key);
             }
             i++;
          }
          _filename = filename;
          _id = id;
+         _csharpName = RemoveCharsAndCapitalize(csharpName, '-');
       }
 
       private static LinkedList<KeyValuePair<string, OutlineItem>> GetHeritage(OutlineItem _item)
@@ -366,6 +378,49 @@ namespace SeqZapManualGenerator
          return stack;
       }
 
+      private static string Capitalize(string _filename)
+      {
+         if (_filename.Length == 0)
+         {
+            return _filename;
+         }
+         
+         if (Char.IsUpper(_filename[0]))
+         {
+            return _filename;
+         }
+         else
+         {
+            return Char.ToUpper(_filename[0]) + _filename.Substring(1);
+         }
+      }
+
+      private static string RemoveCharsAndCapitalize(string s, params char[] chars)
+      {
+         bool capitalizeNext = false;
+         StringBuilder ret = new StringBuilder(s.Length);
+         foreach (char c in s)
+         {
+            if (Array.IndexOf(chars, c) == -1)
+            {
+               if (capitalizeNext)
+               {
+                  ret.Append(Char.ToUpper(c));
+                  capitalizeNext = false;
+               }
+               else
+               {
+                  ret.Append(c);
+               }
+            }
+            else
+            {
+               capitalizeNext = true;
+            }
+         }
+         return ret.ToString();
+      }
+      
       private int m_nextImageIndex = 0;
       private string SaveImage(PngImageContent _image)
       {

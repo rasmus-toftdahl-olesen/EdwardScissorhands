@@ -59,7 +59,8 @@ namespace SeqZapManualGenerator
       {
          string filename;
          string id;
-         HtmlGenerator.GenerateFilenameAndId(_item, this.SmallestLevel, out filename, out id);
+         string csharpName;
+         HtmlGenerator.GenerateFilenameAndId(_item, this.SmallestLevel, out filename, out id, out csharpName);
          if (filename.Length == 0)
          {
             return;
@@ -67,30 +68,18 @@ namespace SeqZapManualGenerator
          
          if (_item.Level > this.SmallestLevel)
          {
-            _writer.WriteLine("      public static readonly Bookmark {0}_{1} = new Bookmark( s_instance, \"{2}\", \"{3}\" );", Capitalize(filename.Replace('-', '_')), Capitalize(id.Replace('-', '_')), filename, id);
+            _writer.WriteLine("      public static readonly Bookmark {0} = new Bookmark( s_instance, \"{1}\", \"{2}\" );", csharpName, filename, id);
          }
          else
          {
             if (_item.Title.Length > 0)
             {
-               _writer.WriteLine("      public static readonly Bookmark {0} = new Bookmark( s_instance, \"{1}\", \"\" );", Capitalize(filename.Replace('-', '_')), filename);
+               _writer.WriteLine("      public static readonly Bookmark {0} = new Bookmark( s_instance, \"{1}\", \"\" );", csharpName, filename);
             }
          }
          foreach (OutlineItem child in _item.Children)
          {
             GenerateItem(child, _writer);
-         }
-      }
-
-      private static string Capitalize(string _filename)
-      {
-         if (Char.IsUpper(_filename[0]))
-         {
-            return _filename;
-         }
-         else
-         {
-            return Char.ToUpper(_filename[0]) + _filename.Substring(1);
          }
       }
    }
