@@ -45,6 +45,7 @@
     <Compile Include="ContentType.cs" />
     <Compile Include="DocRoot.cs" />
     <Compile Include="Edward.cs" />
+    <Compile Include="EdwardVersion.cs" />
     <Compile Include="ImageContent.cs" />
     <Compile Include="ImageUtilities.cs" />
     <Compile Include="OutlineItem.cs" />

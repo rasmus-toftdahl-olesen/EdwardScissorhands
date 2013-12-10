@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("LibEdward")]
 [assembly: AssemblyDescription("Edward Scissorhands is a library designed to make it easy to work with structured word documents.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("CIM Software Testing A/S")]
+[assembly: AssemblyCompany(LibEdward.EdwardVersion.COMPANY)]
 [assembly: AssemblyProduct("LibEdward")]
-[assembly: AssemblyCopyright("Copyright © CIM Software Testing A/S 2013")]
+[assembly: AssemblyCopyright(LibEdward.EdwardVersion.COPYRIGHT)]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion(LibEdward.EdwardVersion.VERSION)]
+[assembly: AssemblyFileVersion(LibEdward.EdwardVersion.VERSION)]

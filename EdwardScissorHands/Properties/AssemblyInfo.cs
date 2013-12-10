@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("EdwardScissorhands")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("CIM Software Testing A/S")]
+[assembly: AssemblyCompany(LibEdward.EdwardVersion.COMPANY)]
 [assembly: AssemblyProduct("EdwardScissorhands")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2013")]
+[assembly: AssemblyCopyright(LibEdward.EdwardVersion.COPYRIGHT)]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion(EdwardScissorhands.Program.VERSION)]
-[assembly: AssemblyFileVersion(EdwardScissorhands.Program.VERSION)]
+[assembly: AssemblyVersion(LibEdward.EdwardVersion.VERSION)]
+[assembly: AssemblyFileVersion(LibEdward.EdwardVersion.VERSION)]

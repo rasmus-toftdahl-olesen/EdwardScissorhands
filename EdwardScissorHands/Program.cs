@@ -6,8 +6,6 @@ namespace EdwardScissorhands
 {
    public static class Program
    {
-      public const string VERSION = "0.3";
-
       /// <summary>
       /// The main entry point for the application.
       /// </summary>

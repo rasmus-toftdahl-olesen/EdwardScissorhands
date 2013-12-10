@@ -49,7 +49,7 @@ namespace EdwardScissorhands
       {
          base.OnLoad(e);
 
-         this.Text += String.Format(" v. {0}", Program.VERSION);
+         this.Text += String.Format(" v. {0}", LibEdward.EdwardVersion.VERSION);
          m_filenameTextbox.Text = m_filename;
          m_loadButton_Click(null, EventArgs.Empty);
 
