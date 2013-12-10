@@ -16,12 +16,15 @@ namespace SeqZapManualGenerator
          SmallestLevel = 3;
       }
 
-      private void HtmlStart(TextWriter writer, string title, string author)
+      private void HtmlStart(TextWriter writer, string title, string author, int pageNumber)
       {
          writer.WriteLine("<!DOCTYPE html>");
          writer.WriteLine("<html>");
          writer.WriteLine("<head>");
          writer.WriteLine("<meta charset=\"utf-8\">");
+         writer.WriteLine("<meta name=\"generator\" content=\"SeqZap Manual Generator v. {0}\">", EdwardVersion.VERSION);
+         writer.WriteLine("<meta name=\"author\" content=\"{0}\">", author );
+         writer.WriteLine("<meta name=\"seqzap-page-number\" content=\"{0}\">", pageNumber);
          writer.WriteLine("<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">");
          writer.WriteLine("<title>{0}</title>", title);
          writer.WriteLine("</head>");
@@ -77,18 +80,18 @@ namespace SeqZapManualGenerator
          using (TextWriter tocWriter = new StreamWriter(Path.Combine(BaseDirectory, "toc.html")))
          {
             //HtmlStart(tocWriter, title + " - Table of contents", author);
-            HtmlStart(tocWriter, "Table of contents", author);
+            HtmlStart(tocWriter, "Table of contents", author, -1);
             tocWriter.WriteLine("<ul>");
             foreach (OutlineItem child in document.Children)
             {
-               GenerateItem(child, tocWriter, null, "toc");
+               GenerateItem(child, tocWriter, null, "toc", author);
             }
             tocWriter.WriteLine("</ul>");
             HtmlEnd(tocWriter);
          }
       }
 
-      private void GenerateItem(OutlineItem item, TextWriter tocWriter, TextWriter parentWriter, string parentFilename)
+      private void GenerateItem(OutlineItem item, TextWriter tocWriter, TextWriter parentWriter, string parentFilename, string author)
       {
          string filename;
          string id;
@@ -102,7 +105,7 @@ namespace SeqZapManualGenerator
 
          using (TextWriter writer = new StreamWriter(Path.Combine(BaseDirectory, filename + ".html")))
          {
-            HtmlStart(writer, item.Title, "NO AUTHOR");
+            HtmlStart(writer, item.Title, author, item.PageNumber);
             writer.WriteLine("<div class=\"nav\">");
             string fullname = null;
             writer.Write("<a href=\"toc.html\">TOC</a>");
@@ -165,7 +168,7 @@ namespace SeqZapManualGenerator
                tocWriter.WriteLine("<ul>");
                foreach (OutlineItem child in item.Children)
                {
-                  GenerateItem(child, tocWriter, writer, filename);
+                  GenerateItem(child, tocWriter, writer, filename, author);
                }
                tocWriter.WriteLine("</ul>");
                writer.WriteLine("</ul>");
@@ -297,9 +300,9 @@ namespace SeqZapManualGenerator
             }
             catch (Exception ex)
             {
-               _writer.WriteLine ( "<div class=\"seqzap-manual-generator-error\">" );
+               _writer.WriteLine("<div class=\"seqzap-manual-generator-error\">");
                _writer.WriteLine("<h1>While trying to generate {0}</h1>", content.Type);
-               _writer.WriteLine("<h2>Message</h2>" );
+               _writer.WriteLine("<h2>Message</h2>");
                _writer.WriteLine("<p>{0}</p>", ex.Message);
                _writer.WriteLine("<h2>Stacktrace</h2>");
                _writer.WriteLine("<pre>{0}</pre>", ex.StackTrace);
@@ -384,7 +387,7 @@ namespace SeqZapManualGenerator
          {
             return _filename;
          }
-         
+
          if (Char.IsUpper(_filename[0]))
          {
             return _filename;
@@ -420,7 +423,7 @@ namespace SeqZapManualGenerator
          }
          return ret.ToString();
       }
-      
+
       private int m_nextImageIndex = 0;
       private string SaveImage(PngImageContent _image)
       {

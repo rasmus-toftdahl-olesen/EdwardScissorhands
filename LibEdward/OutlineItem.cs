@@ -114,6 +114,21 @@ namespace LibEdward
          }
       }
 
+      public int PageNumber
+      {
+         get
+         {
+            if (m_title != null)
+            {
+               return Convert.ToInt32(m_title.Range.get_Information(WdInformation.wdActiveEndPageNumber));
+            }
+            else
+            {
+               return Convert.ToInt32(m_range.get_Information(WdInformation.wdActiveEndPageNumber));
+            }
+         }
+      }
+
       internal OutlineItem(Document _document)
          : this(_document.Content, null, 0)
       {
@@ -284,7 +299,7 @@ namespace LibEdward
                      yield return item.Value;
                      currentEnd = item.Key.End;
                   }
-                  if (currentEnd != cRange.End)
+                  if (currentEnd != cRange.End && currentEnd < cRange.End)
                   {
                      yield return new TextContent(cRange.Document.Range(currentEnd, cRange.End).Text);
                   }

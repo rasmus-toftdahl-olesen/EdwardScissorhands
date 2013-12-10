@@ -46,24 +46,24 @@ namespace SeqZapManualGenerator
             csWriter.WriteLine("      public string Name {{ get {{ return \"{0}\"; }} }}", ClassName);
             csWriter.WriteLine("      public string Title {{ get {{ return \"{0}\"; }} }}", title);
             csWriter.WriteLine("      public string Author {{ get {{ return \"{0}\"; }} }}", author);
-            List<KeyValuePair<string, Uri>> constUrls = new List<KeyValuePair<string,Uri>>();
+            List<KeyValuePair<string, Uri>> constUrls = new List<KeyValuePair<string, Uri>>();
             foreach (OutlineItem child in _document.Children)
             {
                GenerateItem(child, csWriter, constUrls);
             }
             csWriter.WriteLine("      public class Const");
             csWriter.WriteLine("      {");
-            foreach (KeyValuePair<string,Uri> constUrl in constUrls )
+            foreach (KeyValuePair<string, Uri> constUrl in constUrls)
             {
-               csWriter.WriteLine("         public const string {0} = \"{1}\";", constUrl.Key, constUrl.Value );
+               csWriter.WriteLine("         public const string {0} = \"{1}\";", constUrl.Key, constUrl.Value);
             }
             csWriter.WriteLine("      }");
             csWriter.WriteLine("   }");
             csWriter.WriteLine("}");
          }
       }
-      
-      private void GenerateItem(OutlineItem _item, TextWriter _writer, List<KeyValuePair<string,Uri>> _constUrls)
+
+      private void GenerateItem(OutlineItem _item, TextWriter _writer, List<KeyValuePair<string, Uri>> _constUrls)
       {
          string filename;
          string id;
@@ -74,11 +74,11 @@ namespace SeqZapManualGenerator
             return;
          }
 
-         UriBuilder builder = new UriBuilder("seqzap-manual", ClassName );
+         UriBuilder builder = new UriBuilder("seqzap-manual", ClassName, _item.PageNumber);
          builder.Path = filename;
          if (_item.Level > this.SmallestLevel)
          {
-            _writer.WriteLine("      public static readonly Bookmark {0} = new Bookmark( s_instance, \"{1}\", \"{2}\" );", csharpName, filename, id);
+            _writer.WriteLine("      public static readonly Bookmark {0} = new Bookmark( s_instance, \"{1}\", \"{2}\", {3} );", csharpName, filename, id, _item.PageNumber);
             builder.Fragment = id;
             _constUrls.Add(new KeyValuePair<string, Uri>(csharpName, builder.Uri));
          }
@@ -86,7 +86,7 @@ namespace SeqZapManualGenerator
          {
             if (_item.Title.Length > 0)
             {
-               _writer.WriteLine("      public static readonly Bookmark {0} = new Bookmark( s_instance, \"{1}\", \"\" );", csharpName, filename);
+               _writer.WriteLine("      public static readonly Bookmark {0} = new Bookmark( s_instance, \"{1}\", \"\", {2} );", csharpName, filename, _item.PageNumber);
                _constUrls.Add(new KeyValuePair<string, Uri>(csharpName, builder.Uri));
             }
          }
