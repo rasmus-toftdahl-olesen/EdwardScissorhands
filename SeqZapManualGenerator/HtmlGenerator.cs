@@ -251,7 +251,7 @@ namespace SeqZapManualGenerator
 
                   case ContentType.ImagePng:
                      {
-                        PngImageContent image = content.AsPngImage;
+                        PngImageContent image = content.AsPngImage.Scale(0.5f);
                         string imageFileName = SaveImage(image);
                         _writer.WriteLine("<div class=\"figure\">");
                         _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" style=\"width: {2}pt; height: {3}pt;\" />", imageFileName, image.AltText, image.Width, image.Height);

@@ -46,6 +46,7 @@
     <Compile Include="DocRoot.cs" />
     <Compile Include="Edward.cs" />
     <Compile Include="ImageContent.cs" />
+    <Compile Include="ImageUtilities.cs" />
     <Compile Include="OutlineItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TableContent.cs" />
