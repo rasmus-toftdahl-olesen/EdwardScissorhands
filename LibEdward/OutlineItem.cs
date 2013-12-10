@@ -97,7 +97,7 @@ namespace LibEdward
             return m_range.Document;
          }
       }
-      
+
       public string TextContent
       {
          get
@@ -231,14 +231,32 @@ namespace LibEdward
                {
                   usedRanges.Add(new KeyValuePair<Range, Content>(table.Range, new TableContent(table)));
                }
-               
+
                foreach (InlineShape inlineShape in cRange.InlineShapes)
                {
                   inlineShape.Range.CopyAsPicture();
                   object pngData = Clipboard.GetData("PNG");
                   if (pngData is System.IO.MemoryStream)
                   {
-                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new PngImageContent((System.IO.MemoryStream) pngData, inlineShape.AlternativeText, inlineShape.Title)));
+                     float width = inlineShape.Width;
+                     float height = inlineShape.Height;
+                     try
+                     {
+                        float scaleWidth = inlineShape.ScaleWidth;
+                        width *= (scaleWidth / 100.0f);
+                     }
+                     catch
+                     {
+                     }
+                     try
+                     {
+                        float scaleHeight = inlineShape.ScaleHeight;
+                        height *= (scaleHeight / 100.0f);
+                     }
+                     catch
+                     {
+                     }
+                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new PngImageContent((System.IO.MemoryStream) pngData, inlineShape.AlternativeText, inlineShape.Title, width, height)));
                   }
                   else
                   {

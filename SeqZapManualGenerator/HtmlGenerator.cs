@@ -240,7 +240,7 @@ namespace SeqZapManualGenerator
                         }
                         if (listLevels.Count == 0)
                         {
-                           _writer.WriteLine(text.Text);
+                           _writer.WriteLine("<p>{0}</p>", text.Text);
                         }
                         else
                         {
@@ -254,7 +254,7 @@ namespace SeqZapManualGenerator
                         PngImageContent image = content.AsPngImage;
                         string imageFileName = SaveImage(image);
                         _writer.WriteLine("<div class=\"figure\">");
-                        _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" />", imageFileName, image.AltText);
+                        _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" style=\"width: {2}pt; height: {3}pt;\" />", imageFileName, image.AltText, image.Width, image.Height);
                         if (!String.IsNullOrEmpty(image.Title))
                         {
                            _writer.WriteLine("<div class=\"figcaption\">{0}</div>", image.Title);
