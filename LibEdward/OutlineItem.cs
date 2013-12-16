@@ -255,10 +255,15 @@ namespace LibEdward
                   {
                      float width = inlineShape.Width;
                      float height = inlineShape.Height;
+                     string altText = "";
+                     string title = "";
                      try
                      {
                         float scaleWidth = inlineShape.ScaleWidth;
-                        width *= (scaleWidth / 100.0f);
+                        if (scaleWidth > 0.0)
+                        {
+                           width *= (scaleWidth / 100.0f);
+                        }
                      }
                      catch
                      {
@@ -266,12 +271,29 @@ namespace LibEdward
                      try
                      {
                         float scaleHeight = inlineShape.ScaleHeight;
-                        height *= (scaleHeight / 100.0f);
+                        if (scaleHeight > 0.0)
+                        {
+                           height *= (scaleHeight / 100.0f);
+                        }
                      }
                      catch
                      {
                      }
-                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new PngImageContent((System.IO.MemoryStream) pngData, inlineShape.AlternativeText, inlineShape.Title, width, height)));
+                     try
+                     {
+                        altText = inlineShape.AlternativeText;
+                     }
+                     catch
+                     {
+                     }
+                     try
+                     {
+                        title = inlineShape.Title;
+                     }
+                     catch
+                     {
+                     }
+                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new PngImageContent((System.IO.MemoryStream) pngData, altText, title, width, height)));
                   }
                   else
                   {
