@@ -72,7 +72,14 @@ namespace LibEdward
                }
                if (m_children.Count == 0)
                {
-                  m_contentRange = m_range.Document.Range(m_title.Range.End, m_range.End);
+                  if (m_title.Range.End == m_range.End)
+                  {
+                     return null;
+                  }
+                  else
+                  {
+                     m_contentRange = m_range.Document.Range(m_title.Range.End, m_range.End);
+                  }
                }
                else
                {
