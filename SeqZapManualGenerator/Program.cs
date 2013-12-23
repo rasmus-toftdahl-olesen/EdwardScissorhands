@@ -24,7 +24,7 @@ namespace SeqZapManualGenerator
 
             htmlGenerator.Generate(document, Path.Combine(Path.GetDirectoryName(inputFile), Path.GetFileNameWithoutExtension(inputFile)));
 
-            csGenerator.ClassName = Path.GetFileNameWithoutExtension(inputFile);
+            csGenerator.ClassName = Path.GetFileNameWithoutExtension(inputFile).Replace(" ", "_");
             if (args.Length > 1)
             {
                csGenerator.Namespace = args[1];
