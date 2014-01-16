@@ -304,14 +304,20 @@ namespace LibEdward
                   }
                   else
                   {
-                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new TextContent(String.Format("INTERNAL ERROR: Could not convert shape to PNG image."))));
+                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new TextContent(String.Format("INTERNAL ERROR: Could not convert shape to PNG image."), null)));
                   }
                   Clipboard.Clear();
                }
 
                foreach (Paragraph paragraph in cRange.ListParagraphs)
                {
-                  usedRanges.Add(new KeyValuePair<Range, Content>(paragraph.Range, new TextContent(paragraph.Range.Text, paragraph.Range.ListFormat.ListLevelNumber, paragraph.Range.ListFormat.ListType)));
+                  object style = paragraph.get_Style();
+                  string styleName = null;
+                  if (style is Style)
+                  {
+                     styleName = (style as Style).NameLocal;
+                  }
+                  usedRanges.Add(new KeyValuePair<Range, Content>(paragraph.Range, new TextContent(paragraph.Range.Text, paragraph.Range.ListFormat.ListLevelNumber, paragraph.Range.ListFormat.ListType, styleName)));
                }
 
                if (usedRanges.Count > 0)
@@ -323,19 +329,30 @@ namespace LibEdward
                   {
                      if (item.Key.Start != currentEnd)
                      {
-                        yield return new TextContent(item.Key.Document.Range(currentEnd, item.Key.Start).Text);
+                        Range textRange = item.Key.Document.Range(currentEnd, item.Key.Start);
+                        string text = textRange.Text;
+                        foreach (TextContent paragraph in ListParagraphsFor(textRange))
+                        {
+                           yield return paragraph;
+                        }
                      }
                      yield return item.Value;
                      currentEnd = item.Key.End;
                   }
                   if (currentEnd != cRange.End && currentEnd < cRange.End)
                   {
-                     yield return new TextContent(cRange.Document.Range(currentEnd, cRange.End).Text);
+                     foreach (TextContent paragraph in ListParagraphsFor(cRange.Document.Range(currentEnd, cRange.End)))
+                     {
+                        yield return paragraph;
+                     }
                   }
                }
                else
                {
-                  yield return new TextContent(cRange.Text);
+                  foreach (TextContent content in ListParagraphsFor(cRange))
+                  {
+                     yield return content;
+                  }
                }
             }
          }
@@ -344,6 +361,31 @@ namespace LibEdward
       private static int SortRanges(KeyValuePair<Range, Content> a, KeyValuePair<Range, Content> b)
       {
          return a.Key.Start.CompareTo(b.Key.Start);
+      }
+
+      private static IEnumerable<TextContent> ListParagraphsFor(Range _range)
+      {
+         string text = _range.Text;
+         if (text != null)
+         {
+            string[] paragraphParts = text.Split('\r');
+            foreach (string paragraphText in paragraphParts)
+            {
+               yield return new TextContent(paragraphText, GetStyleName(_range.get_Style()));
+            }
+         }
+      }
+
+      private static string GetStyleName(object _style)
+      {
+         if (_style is Style)
+         {
+            return (_style as Style).NameLocal;
+         }
+         else
+         {
+            return null;
+         }
       }
    }
 }
