@@ -368,6 +368,7 @@ namespace LibEdward
          string text = _range.Text;
          if (text != null)
          {
+            text = text.Trim('\r');
             string[] paragraphParts = text.Split('\r');
             foreach (string paragraphText in paragraphParts)
             {

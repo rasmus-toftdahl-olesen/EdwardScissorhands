@@ -23,7 +23,7 @@ namespace SeqZapManualGenerator
          writer.WriteLine("<head>");
          writer.WriteLine("<meta charset=\"utf-8\">");
          writer.WriteLine("<meta name=\"generator\" content=\"SeqZap Manual Generator v. {0}\">", EdwardVersion.VERSION);
-         writer.WriteLine("<meta name=\"author\" content=\"{0}\">", author );
+         writer.WriteLine("<meta name=\"author\" content=\"{0}\">", author);
          writer.WriteLine("<meta name=\"seqzap-page-number\" content=\"{0}\">", pageNumber);
          writer.WriteLine("<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">");
          writer.WriteLine("<title>{0}</title>", title);
@@ -243,11 +243,20 @@ namespace SeqZapManualGenerator
                         }
                         if (listLevels.Count == 0)
                         {
-                           _writer.WriteLine("<p>{0}</p>", text.Text);
+                           switch (text.Style)
+                           {
+                              case "Code":
+                                 _writer.WriteLine("<code>{0}</code>", HtmlEscape(text.Text));
+                                 break;
+
+                              default:
+                                 _writer.WriteLine("<p>{0}</p>", HtmlEscape(text.Text));
+                                 break;
+                           }
                         }
                         else
                         {
-                           _writer.WriteLine("<li>{0}</li>", text.Text);
+                           _writer.WriteLine("<li>{0}</li>", HtmlEscape(text.Text));
                         }
                      }
                      break;
@@ -281,7 +290,7 @@ namespace SeqZapManualGenerator
                            foreach (TableContent.Cell cell in row.Cells)
                            {
                               int colSpan = cell.ColumnSpan;
-                              string text = cell.Text;
+                              string text = HtmlEscape(cell.Text);
                               if (colSpan > 1)
                               {
                                  _writer.Write("<{0} colspan=\"{2}\">{1}</{0}>", tag, text, colSpan);
@@ -440,6 +449,11 @@ namespace SeqZapManualGenerator
             _image.Write(stream);
          }
          return "images/" + imageFilename;
+      }
+
+      private static string HtmlEscape(string _text)
+      {
+         return _text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quote;");
       }
    }
 }
