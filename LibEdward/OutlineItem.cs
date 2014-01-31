@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Word;
 using System.Windows.Forms;
 
@@ -253,60 +254,14 @@ namespace LibEdward
                {
                   usedRanges.Add(new KeyValuePair<Range, Content>(table.Range, new TableContent(table)));
                }
-
+               foreach (Shape shape in cRange.ShapeRange)
+               {
+                  InlineShape inlineShape = shape.ConvertToInlineShape();
+                  usedRanges.Add(ProcessInlineShape(inlineShape));
+               }
                foreach (InlineShape inlineShape in cRange.InlineShapes)
                {
-                  inlineShape.Range.CopyAsPicture();
-                  object pngData = Clipboard.GetData("PNG");
-                  if (pngData is System.IO.MemoryStream)
-                  {
-                     float width = inlineShape.Width;
-                     float height = inlineShape.Height;
-                     string altText = "";
-                     string title = "";
-                     try
-                     {
-                        float scaleWidth = inlineShape.ScaleWidth;
-                        if (scaleWidth > 0.0)
-                        {
-                           width *= (scaleWidth / 100.0f);
-                        }
-                     }
-                     catch
-                     {
-                     }
-                     try
-                     {
-                        float scaleHeight = inlineShape.ScaleHeight;
-                        if (scaleHeight > 0.0)
-                        {
-                           height *= (scaleHeight / 100.0f);
-                        }
-                     }
-                     catch
-                     {
-                     }
-                     try
-                     {
-                        altText = inlineShape.AlternativeText;
-                     }
-                     catch
-                     {
-                     }
-                     try
-                     {
-                        title = inlineShape.Title;
-                     }
-                     catch
-                     {
-                     }
-                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new PngImageContent((System.IO.MemoryStream) pngData, altText, title, width, height)));
-                  }
-                  else
-                  {
-                     usedRanges.Add(new KeyValuePair<Range, Content>(inlineShape.Range, new TextContent(String.Format("INTERNAL ERROR: Could not convert shape to PNG image."), null)));
-                  }
-                  Clipboard.Clear();
+                  usedRanges.Add(ProcessInlineShape(inlineShape));
                }
 
                foreach (Paragraph paragraph in cRange.ListParagraphs)
@@ -370,9 +325,23 @@ namespace LibEdward
          {
             text = text.Trim('\r');
             string[] paragraphParts = text.Split('\r');
+            int currentStart = _range.Start;
             foreach (string paragraphText in paragraphParts)
             {
-               yield return new TextContent(paragraphText, GetStyleName(_range.get_Style()));
+               if (paragraphText == "/")
+               {
+                  yield return new TextContent("SeqZapManualGenerator: Unhandled figure/shape/???", "seqzap-manual-generator-error");
+               }
+               else
+               {
+                  Range paragraphRange = _range.Document.Range(currentStart, currentStart + paragraphText.Length);
+                  object paragraphStyle = paragraphRange.get_Style();
+                  string style = GetStyleName(paragraphStyle);
+
+                  yield return new TextContent(paragraphText, style);
+
+                  currentStart += paragraphText.Length + 1;
+               }
             }
          }
       }
@@ -387,6 +356,112 @@ namespace LibEdward
          {
             return null;
          }
+      }
+
+      private static KeyValuePair<Range, Content> ProcessInlineShape(InlineShape _shape)
+      {
+         float width = _shape.Width;
+         float height = _shape.Height;
+         string altText = "";
+         string title = "";
+         try
+         {
+            float scaleWidth = _shape.ScaleWidth;
+            if (scaleWidth > 0.0)
+            {
+               width *= (scaleWidth / 100.0f);
+            }
+         }
+         catch
+         {
+         }
+         try
+         {
+            float scaleHeight = _shape.ScaleHeight;
+            if (scaleHeight > 0.0)
+            {
+               height *= (scaleHeight / 100.0f);
+            }
+         }
+         catch
+         {
+         }
+         try
+         {
+            altText = _shape.AlternativeText;
+         }
+         catch
+         {
+         }
+         try
+         {
+            title = _shape.Title;
+         }
+         catch
+         {
+         }
+         PngImageContent imageContent = null;
+         _shape.Range.CopyAsPicture();
+         object pngData = Clipboard.GetData("PNG");
+         if (pngData is System.IO.MemoryStream)
+         {
+            imageContent = new PngImageContent((System.IO.MemoryStream) pngData, altText, title, width, height);
+         }
+         else
+         {
+            if (Clipboard.ContainsData(DataFormats.EnhancedMetafile))
+            {
+               if (ClipboardFunctions.OpenClipboard(IntPtr.Zero))
+               {
+                  width *= 1.5f;
+                  height *= 1.5f;
+                  IntPtr data = ClipboardFunctions.GetClipboardData(DataFormats.GetFormat(DataFormats.EnhancedMetafile).Id);
+                  System.Drawing.Imaging.Metafile metaFile = new System.Drawing.Imaging.Metafile(data, true);
+                  ClipboardFunctions.CloseClipboard();
+                  System.Drawing.Bitmap pngImage = new System.Drawing.Bitmap((int) width, (int) height);
+                  using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(pngImage))
+                  {
+                     g.DrawImage(metaFile, new System.Drawing.Rectangle(0, 0, (int) width, (int) height));
+                  }
+                  metaFile.Dispose();
+                  System.IO.MemoryStream pngDataStream = new System.IO.MemoryStream();
+                  pngImage.Save(pngDataStream, System.Drawing.Imaging.ImageFormat.Png);
+                  pngDataStream.Seek(0, System.IO.SeekOrigin.Begin);
+                  imageContent = new PngImageContent(pngDataStream, altText, title, width, height);
+                  pngImage.Dispose();
+               }
+            }
+         }
+         Clipboard.Clear();
+         if (imageContent == null)
+         {
+            return new KeyValuePair<Range, Content>(_shape.Range, new TextContent(String.Format("INTERNAL ERROR: Could not convert shape to PNG image."), "seqzap-manual-generator-error"));
+         }
+         else
+         {
+            return new KeyValuePair<Range, Content>(_shape.Range, imageContent);
+         }
+      }
+
+      public class ClipboardFunctions
+      {
+         [DllImport("user32.dll", EntryPoint = "OpenClipboard", SetLastError = true, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+         public static extern bool OpenClipboard(IntPtr hWnd);
+
+         [DllImport("user32.dll", EntryPoint = "EmptyClipboard", SetLastError = true, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+         public static extern bool EmptyClipboard();
+
+         [DllImport("user32.dll", EntryPoint = "SetClipboardData", SetLastError = true, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+         public static extern IntPtr SetClipboardData(int uFormat, IntPtr hWnd);
+
+         [DllImport("user32.dll", EntryPoint = "CloseClipboard", SetLastError = true, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+         public static extern bool CloseClipboard();
+
+         [DllImport("user32.dll", EntryPoint = "GetClipboardData", SetLastError = true, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+         public static extern IntPtr GetClipboardData(int uFormat);
+
+         [DllImport("user32.dll", EntryPoint = "IsClipboardFormatAvailable", SetLastError = true, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+         public static extern short IsClipboardFormatAvailable(int uFormat);
       }
    }
 }

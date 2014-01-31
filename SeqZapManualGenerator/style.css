@@ -1,52 +1,79 @@
 ﻿body
 {
-    font-family: Corbel, sans-serif;	
-    margin: 0;
-    padding: 0;
+	font-family: Corbel, sans-serif;
+	margin: 0;
+	padding: 0;
 }
+
 a
 {
-    text-decoration: underline;
-    color: #C00000;
+	text-decoration: underline;
+	color: #C00000;
 }
+
 body .nav
 {
-    background-color: #C00000;
-    padding: 5px;
-    color: white;
-    font-weight: bold;
+	background-color: #C00000;
+	padding: 5px;
+	color: white;
+	font-weight: bold;
 }
-body .nav a
-{
-    color: white;
-}
-body .nav .relational
-{
-    position: absolute;
-    top: 5px;
-    right: 5px;
-}
-body .nav .relational a
-{
-    text-align: right;
-}
+
+	body .nav a
+	{
+		color: white;
+	}
+
+	body .nav .relational
+	{
+		position: absolute;
+		top: 5px;
+		right: 5px;
+	}
+
+		body .nav .relational a
+		{
+			text-align: right;
+		}
+
 body .content
 {
-    padding-left: 1em;
+	padding-left: 1em;
+	padding-right: 1em;
 }
 
 table
 {
-    border: 1px solid #595959;
-    border-collapse: collapse;
+	border: 1px solid #595959;
+	border-collapse: collapse;
 }
-table td
+
+	table td
+	{
+		border: 1px solid #595959;
+		padding: 0.15cm;
+	}
+
+	table th
+	{
+		background-color: #595959;
+		color: white;
+	}
+
+code
 {
-    border: 1px solid #595959;
-    padding: 0.15cm;
+	display: block;
+	background-color: lightgray;
+	color: black;
+	font-family: 'Courier New', monospace;
+	padding: 5px;
 }
-table th
+
+.seqzap-manual-generator-error
 {
-    background-color: #595959;
-    color: white;
+	display: block;
+	background-color: red;
+	color: white;
+	font-size: 200%;
+	padding: 1em;
 }

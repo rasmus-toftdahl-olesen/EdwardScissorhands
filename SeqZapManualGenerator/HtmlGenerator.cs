@@ -26,7 +26,7 @@ namespace SeqZapManualGenerator
          writer.WriteLine("<meta name=\"author\" content=\"{0}\">", author);
          writer.WriteLine("<meta name=\"seqzap-page-number\" content=\"{0}\">", pageNumber);
          writer.WriteLine("<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">");
-         writer.WriteLine("<title>{0}</title>", title);
+         writer.WriteLine("<title>{0}</title>", HtmlEscape(title));
          writer.WriteLine("</head>");
          writer.WriteLine("<body>");
       }
@@ -122,7 +122,7 @@ namespace SeqZapManualGenerator
                }
                if (heritageItem.Value != null)
                {
-                  writer.Write("<a href=\"{0}.html\">{1}</a>", fullname, heritageItem.Value.Title);
+                  writer.Write("<a href=\"{0}.html\">{1}</a>", fullname, HtmlEscape(heritageItem.Value.Title));
                }
             }
             writer.WriteLine();
@@ -157,9 +157,9 @@ namespace SeqZapManualGenerator
             writer.WriteLine("</div>");
             if (parentWriter != null)
             {
-               parentWriter.Write("<li><a href=\"{0}.html\">{1}</a>", filename, item.Title);
+               parentWriter.Write("<li><a href=\"{0}.html\">{1}</a>", filename, HtmlEscape(item.Title));
             }
-            tocWriter.Write("<li><a href=\"{0}.html\">{1}</a>", filename, item.Title);
+            tocWriter.Write("<li><a href=\"{0}.html\">{1}</a>", filename, HtmlEscape(item.Title));
             HtmlItem(item, writer, item.Level);
             if (item.Level < this.SmallestLevel)
             {
@@ -204,11 +204,11 @@ namespace SeqZapManualGenerator
 
          if (String.IsNullOrEmpty(id))
          {
-            _writer.WriteLine("<h{0}>{1}</h{0}>", _item.Level - _topLevel + 1, _item.Title);
+            _writer.WriteLine("<h{0}>{1}</h{0}>", _item.Level - _topLevel + 1, HtmlEscape(_item.Title));
          }
          else
          {
-            _writer.WriteLine("<h{0} id=\"{2}\">{1}</h{0}>", _item.Level - _topLevel + 1, _item.Title, id);
+            _writer.WriteLine("<h{0} id=\"{2}\">{1}</h{0}>", _item.Level - _topLevel + 1, HtmlEscape(_item.Title), id);
          }
          _writer.WriteLine("<div class=\"content\">");
          List<string> listLevels = new List<string>();
@@ -249,6 +249,10 @@ namespace SeqZapManualGenerator
                                  _writer.WriteLine("<code>{0}</code>", HtmlEscape(text.Text));
                                  break;
 
+                              case "seqzap-manual-generator-error":
+                                 _writer.WriteLine("<div class=\"{0}\">{1}</div>", text.Style, HtmlEscape(text.Text));
+                                 break;
+
                               default:
                                  _writer.WriteLine("<p>{0}</p>", HtmlEscape(text.Text));
                                  break;
@@ -263,13 +267,13 @@ namespace SeqZapManualGenerator
 
                   case ContentType.ImagePng:
                      {
-                        PngImageContent image = content.AsPngImage.Scale(0.8f);
+                        PngImageContent image = content.AsPngImage; //.Scale(0.8f);
                         string imageFileName = SaveImage(image);
                         _writer.WriteLine("<div class=\"figure\">");
-                        _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" style=\"width: {2}pt; height: {3}pt;\" />", imageFileName, image.AltText, image.Width, image.Height);
+                        _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" style=\"width: {2}pt; height: {3}pt;\" />", imageFileName, HtmlEscape(image.AltText), image.Width, image.Height);
                         if (!String.IsNullOrEmpty(image.Title))
                         {
-                           _writer.WriteLine("<div class=\"figcaption\">{0}</div>", image.Title);
+                           _writer.WriteLine("<div class=\"figcaption\">{0}</div>", HtmlEscape(image.Title));
                         }
                         _writer.WriteLine("</div>");
                      }
@@ -293,11 +297,11 @@ namespace SeqZapManualGenerator
                               string text = HtmlEscape(cell.Text);
                               if (colSpan > 1)
                               {
-                                 _writer.Write("<{0} colspan=\"{2}\">{1}</{0}>", tag, text, colSpan);
+                                 _writer.Write("<{0} colspan=\"{2}\">{1}</{0}>", tag, HtmlEscape(text), colSpan);
                               }
                               else
                               {
-                                 _writer.Write("<{0}>{1}</{0}>", tag, text);
+                                 _writer.Write("<{0}>{1}</{0}>", tag, HtmlEscape(text));
                               }
                            }
                            _writer.WriteLine("</tr>");
@@ -312,9 +316,9 @@ namespace SeqZapManualGenerator
                _writer.WriteLine("<div class=\"seqzap-manual-generator-error\">");
                _writer.WriteLine("<h1>While trying to generate {0}</h1>", content.Type);
                _writer.WriteLine("<h2>Message</h2>");
-               _writer.WriteLine("<p>{0}</p>", ex.Message);
+               _writer.WriteLine("<p>{0}</p>", HtmlEscape(ex.Message));
                _writer.WriteLine("<h2>Stacktrace</h2>");
-               _writer.WriteLine("<pre>{0}</pre>", ex.StackTrace);
+               _writer.WriteLine("<pre>{0}</pre>", HtmlEscape(ex.StackTrace));
                _writer.WriteLine("</div>");
             }
          }
@@ -453,7 +457,14 @@ namespace SeqZapManualGenerator
 
       private static string HtmlEscape(string _text)
       {
-         return _text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quote;");
+         if (_text == null)
+         {
+            return String.Empty;
+         }
+         else
+         {
+            return _text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quote;");
+         }
       }
    }
 }
