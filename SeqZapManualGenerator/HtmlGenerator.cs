@@ -267,10 +267,10 @@ namespace SeqZapManualGenerator
 
                   case ContentType.ImagePng:
                      {
-                        PngImageContent image = content.AsPngImage; //.Scale(0.8f);
+                        PngImageContent image = content.AsPngImage;
                         string imageFileName = SaveImage(image);
                         _writer.WriteLine("<div class=\"figure\">");
-                        _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" style=\"width: {2}pt; height: {3}pt;\" />", imageFileName, HtmlEscape(image.AltText), image.Width, image.Height);
+                        _writer.WriteLine("<img src=\"{0}\" alt=\"{1}\" style=\"width: {2}pt; height: {3}pt;\" />", imageFileName, HtmlEscape(image.AltText), image.Width.ToString(System.Globalization.CultureInfo.InvariantCulture), image.Height.ToString(System.Globalization.CultureInfo.InvariantCulture));
                         if (!String.IsNullOrEmpty(image.Title))
                         {
                            _writer.WriteLine("<div class=\"figcaption\">{0}</div>", HtmlEscape(image.Title));

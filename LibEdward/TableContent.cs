@@ -21,7 +21,7 @@ namespace LibEdward
             m_numberOfColumnsAccordingToTable = _numberOfColumnsAccordingToTable;
             m_applyHeadingStyle = _applyHeadingStyle;
          }
-
+         
          public bool IsHeading
          {
             get

@@ -369,7 +369,7 @@ namespace LibEdward
             float scaleWidth = _shape.ScaleWidth;
             if (scaleWidth > 0.0)
             {
-               width *= (scaleWidth / 100.0f);
+               //width *= (scaleWidth / 100.0f);
             }
          }
          catch
@@ -380,7 +380,7 @@ namespace LibEdward
             float scaleHeight = _shape.ScaleHeight;
             if (scaleHeight > 0.0)
             {
-               height *= (scaleHeight / 100.0f);
+               //height *= (scaleHeight / 100.0f);
             }
          }
          catch
