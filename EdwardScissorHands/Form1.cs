@@ -112,7 +112,7 @@ namespace EdwardScissorhands
                               if (File.Exists(fullStyleName))
                               {
                                  masterDoc.CopyStylesFromTemplate(fullStyleName);
-                                 Document styleDocument = app.Documents.Open(fullStyleName);
+                                 Document styleDocument = app.Documents.OpenNoRepairDialog(fullStyleName);
                                  if (styleDocument.Sections.Count > 0)
                                  {
                                     // Copying headers from style to master document
@@ -189,7 +189,7 @@ namespace EdwardScissorhands
                         MessageBox.Show("Could not find the file named " + fullPath);
                         return;
                      }
-                     Document document = app.Documents.Open(fullPath);
+                     Document document = app.Documents.OpenNoRepairDialog(fullPath);
                      document.Content.Copy();
                      app.Selection.Start = app.Selection.End;
                      masterDoc.Range(masterDoc.Content.End - 1, masterDoc.Content.End).Paste();

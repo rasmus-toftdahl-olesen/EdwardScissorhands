@@ -37,7 +37,7 @@ namespace LibEdward
             (doc as _Document).Save();
          }
       }
-      
+
       public static void StopWord()
       {
          if (s_application != null)
@@ -51,7 +51,7 @@ namespace LibEdward
       public static OutlineItem LoadAndOutline(string _filename)
       {
          StartWord();
-         return Outline(s_application.Documents.Open(_filename));
+         return Outline(s_application.Documents.OpenNoRepairDialog(_filename));
       }
 
       public static OutlineItem Create(string _filename)
@@ -66,7 +66,7 @@ namespace LibEdward
       {
          return Outline(item.Range.Document);
       }
-      
+
       public static OutlineItem Outline(Document document)
       {
          OutlineItem documentItem = new OutlineItem(document);
