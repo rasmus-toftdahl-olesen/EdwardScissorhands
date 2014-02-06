@@ -112,13 +112,69 @@ namespace EdwardScissorhands
                               if (File.Exists(fullStyleName))
                               {
                                  masterDoc.CopyStylesFromTemplate(fullStyleName);
+                                 Document styleDocument = app.Documents.Open(fullStyleName);
+                                 if (styleDocument.Sections.Count > 0)
+                                 {
+                                    // Copying headers from style to master document
+                                    {
+                                       HeaderFooter primaryHeader = styleDocument.Sections[1].Headers[WdHeaderFooterIndex.wdHeaderFooterPrimary];
+                                       if (primaryHeader != null)
+                                       {
+                                          primaryHeader.Range.Copy();
+                                          masterDoc.Sections[1].Headers[WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.Paste();
+                                       }
+                                    }
+                                    {
+                                       HeaderFooter evenPagesHeader = styleDocument.Sections[1].Headers[WdHeaderFooterIndex.wdHeaderFooterEvenPages];
+                                       if (evenPagesHeader != null)
+                                       {
+                                          evenPagesHeader.Range.Copy();
+                                          masterDoc.Sections[1].Headers[WdHeaderFooterIndex.wdHeaderFooterEvenPages].Range.Paste();
+                                       }
+                                    }
+                                    {
+                                       HeaderFooter firstPageHeader = styleDocument.Sections[1].Headers[WdHeaderFooterIndex.wdHeaderFooterFirstPage];
+                                       if (firstPageHeader != null)
+                                       {
+                                          firstPageHeader.Range.Copy();
+                                          masterDoc.Sections[1].Headers[WdHeaderFooterIndex.wdHeaderFooterFirstPage].Range.Paste();
+                                       }
+                                    }
+
+                                    // Copying footers from style to master document
+                                    {
+                                       HeaderFooter primaryFooter = styleDocument.Sections[1].Footers[WdHeaderFooterIndex.wdHeaderFooterPrimary];
+                                       if (primaryFooter != null)
+                                       {
+                                          primaryFooter.Range.Copy();
+                                          masterDoc.Sections[1].Footers[WdHeaderFooterIndex.wdHeaderFooterPrimary].Range.Paste();
+                                       }
+                                    }
+                                    {
+                                       HeaderFooter evenPagesFooter = styleDocument.Sections[1].Footers[WdHeaderFooterIndex.wdHeaderFooterEvenPages];
+                                       if (evenPagesFooter != null)
+                                       {
+                                          evenPagesFooter.Range.Copy();
+                                          masterDoc.Sections[1].Footers[WdHeaderFooterIndex.wdHeaderFooterEvenPages].Range.Paste();
+                                       }
+                                    }
+                                    {
+                                       HeaderFooter firstPageFooter = styleDocument.Sections[1].Footers[WdHeaderFooterIndex.wdHeaderFooterFirstPage];
+                                       if (firstPageFooter != null)
+                                       {
+                                          firstPageFooter.Range.Copy();
+                                          masterDoc.Sections[1].Footers[WdHeaderFooterIndex.wdHeaderFooterFirstPage].Range.Paste();
+                                       }
+                                    }
+                                 }
+                                 styleDocument.Close();
                               }
                               else
                               {
                                  MessageBox.Show("Could not find style {0}", fullStyleName);
                               }
                               break;
-                              
+
                            default:
                               MessageBox.Show(String.Format("Unknown meta data: {0} = {1}", key, value));
                               break;
