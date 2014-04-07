@@ -463,7 +463,7 @@ namespace SeqZapManualGenerator
          }
          else
          {
-            return _text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quote;");
+            return _text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quote;").Replace("\v", "<br />");
          }
       }
    }

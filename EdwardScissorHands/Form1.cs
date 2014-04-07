@@ -167,7 +167,7 @@ namespace EdwardScissorhands
                                        }
                                     }
                                  }
-                                 styleDocument.Close();
+                                 (styleDocument as _Document).Close();
                               }
                               else
                               {
