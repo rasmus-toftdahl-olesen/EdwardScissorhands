@@ -272,7 +272,9 @@ namespace LibEdward
                   {
                      styleName = (style as Style).NameLocal;
                   }
-                  usedRanges.Add(new KeyValuePair<Range, Content>(paragraph.Range, new TextContent(paragraph.Range.Text, paragraph.Range.ListFormat.ListLevelNumber, paragraph.Range.ListFormat.ListType, styleName)));
+                  string paragraphText = paragraph.Range.Text;
+                  paragraphText = paragraphText.Replace("\v", "");
+                  usedRanges.Add(new KeyValuePair<Range, Content>(paragraph.Range, new TextContent(paragraphText, paragraph.Range.ListFormat.ListLevelNumber, paragraph.Range.ListFormat.ListType, styleName)));
                }
 
                if (usedRanges.Count > 0)
@@ -282,7 +284,7 @@ namespace LibEdward
                   int currentEnd = cRange.Start;
                   foreach (KeyValuePair<Range, Content> item in usedRanges)
                   {
-                     if (item.Key.Start != currentEnd)
+                     if (item.Key.Start > currentEnd)
                      {
                         Range textRange = item.Key.Document.Range(currentEnd, item.Key.Start);
                         string text = textRange.Text;
