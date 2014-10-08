@@ -1,14 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdwardScissorhands", "EdwardScissorHands\EdwardScissorhands.csproj", "{368229BA-145C-4EAE-8E85-A80066EAE695}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibEdward", "LibEdward\LibEdward.csproj", "{FBA1049E-3F6D-4F72-87A6-8EA937615761}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdwardsOutline", "EdwardsOutline\EdwardsOutline.csproj", "{65B5BF2B-10EF-4C66-8BCB-E8C09A905D30}"
-	ProjectSection(ProjectDependencies) = postProject
-		{FBA1049E-3F6D-4F72-87A6-8EA937615761} = {FBA1049E-3F6D-4F72-87A6-8EA937615761}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeqZapManualGenerator", "SeqZapManualGenerator\SeqZapManualGenerator.csproj", "{F1BFA0BC-3AD9-4F0D-ADEA-8800FA0CD6FC}"
 EndProject
