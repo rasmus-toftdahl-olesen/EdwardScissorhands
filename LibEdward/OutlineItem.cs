@@ -240,7 +240,7 @@ namespace LibEdward
       {
          m_range = m_range.Document.Range( m_range.Start, _newEnd );
          m_endParagraphIndex = _endParagraph;
-      }    
+      }
 
       public IEnumerable<Content> Content
       {
