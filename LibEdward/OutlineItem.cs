@@ -406,7 +406,7 @@ namespace LibEdward
                   {
                      parts.Add( new TextPart( _paragraph.Range.Document.Range( i, link.Range.Start ).Text.TrimEnd( '\r' ), TextPartType.Plain ) );
                   }
-                  parts.Add( new TextPart( link.TextToDisplay, TextPartType.Hyperlink, new Uri( link.Address ) ) );
+                  parts.Add( new TextPart( link.TextToDisplay, TextPartType.Hyperlink, link.Address ) );
                   i = link.Range.End;
                }
                if ( i != _paragraph.Range.End )
