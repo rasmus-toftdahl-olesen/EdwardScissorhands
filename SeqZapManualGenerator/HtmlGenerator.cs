@@ -328,11 +328,11 @@ namespace SeqZapManualGenerator
                               string text = HtmlEscape( cell.Text );
                               if ( colSpan > 1 )
                               {
-                                 _writer.Write( "<{0} colspan=\"{2}\">{1}</{0}>", tag, HtmlEscape( text ), colSpan );
+                                 _writer.Write( "<{0} colspan=\"{2}\">{1}</{0}>", tag, text, colSpan );
                               }
                               else
                               {
-                                 _writer.Write( "<{0}>{1}</{0}>", tag, HtmlEscape( text ) );
+                                 _writer.Write( "<{0}>{1}</{0}>", tag, text );
                               }
                            }
                            _writer.WriteLine( "</tr>" );
