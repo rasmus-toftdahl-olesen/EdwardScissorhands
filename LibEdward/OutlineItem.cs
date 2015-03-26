@@ -198,6 +198,22 @@ namespace LibEdward
          }
       }
 
+      public void AddTextContentAfterTitle( string _textContent )
+      {
+         Range contentRange = this.ContentRange;
+         if ( contentRange == null )
+         {
+            if ( this.Children.Count > 0 )
+            {
+               this.Children[0].Range.InsertBefore( _textContent + "\r" );
+            }
+         }
+         else
+         {
+            contentRange.InsertBefore( _textContent + "\r" );
+         }
+      }
+
       public void AppendChild( string title )
       {
          int level = this.Level;

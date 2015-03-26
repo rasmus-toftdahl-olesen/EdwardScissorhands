@@ -30,5 +30,10 @@ namespace LibEdward
          }
          return parent;
       }
+
+      public void Refresh ()
+      {
+         m_root = Edward.Refresh( m_root );
+      }
    }
 }
